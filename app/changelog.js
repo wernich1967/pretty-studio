@@ -1,5 +1,12 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.6.0', date: '2026-10-04', items: [
+    'Sales: record sales with several products, prices fill in from the product, stock goes down and profit is worked out per sale.',
+    'Financial: money in vs money out by month, cash left, profit, gross margin and best products — for this month, last month, this year or all time.',
+    'Other expenses (courier, market fees, printing…) so profit is real.',
+    'Curing: batches that need time, with a countdown and a “Ready now” button.',
+    'Calculators: percentage formula → grams, fragrance amount per product type, and the soap lye calculator.'
+  ]},
   { version: '0.5.0', date: '2026-10-04', items: [
     'Purchases: record what you buy (several items per invoice), attach the invoice photo or PDF — stock goes up automatically.',
     'New items and suppliers can be added straight from a purchase.',

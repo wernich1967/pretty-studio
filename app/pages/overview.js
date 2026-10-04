@@ -13,12 +13,14 @@ export function render() {
     <div class="card"><h2>Quick links</h2><div class="list">
       <a class="li qlink" href="#/inventory"><span class="name">Inventory — ingredients & supplies</span>›</a>
       <a class="li qlink" href="#/products"><span class="name">Finished products</span>›</a>
+      <a class="li qlink" href="#/sales"><span class="name">Record a sale</span>›</a>
+      <a class="li qlink" href="#/financial"><span class="name">Financial — money in, money out, profit</span>›</a>
       <a class="li qlink" href="#/settings"><span class="name">Settings — categories & business details</span>›</a>
       <a class="li qlink" href="#/maintenance"><span class="name">Maintenance — backup & test data</span>›</a></div></div></div>`;
 }
 export async function after() {
   const d = await api('/dashboard');
-  $('#tiles').innerHTML = [['Inventory items', d.materials], ['Finished products', d.products], ['Recipes', d.recipes], ['Low stock', d.lowStock], ['Stock value', money(d.stockValue)]]
+  $('#tiles').innerHTML = [['Sales this month', money(d.salesMonth)], ['Inventory items', d.materials], ['Finished products', d.products], ['Low stock', d.lowStock], ['Curing', d.curing], ['Stock value', money(d.stockValue)]]
     .map(([k, v]) => `<div class="tile"><div class="k">${k}</div><div class="v" ${k === 'Low stock' && v ? 'style="color:var(--rose)"' : ''}>${v}</div></div>`).join('');
   $('#recent').innerHTML = d.recent.length ? `<div class="list">${d.recent.map(m => `<div class="li"><span class="note" style="width:84px">${esc(m.date)}</span><span class="name">${esc(m.name)} <span class="note">· ${REASONS[m.reason] || m.reason}</span></span><b style="color:${m.qty < 0 ? 'var(--rose)' : 'var(--ok)'}">${m.qty > 0 ? '+' : ''}${qty(m.qty, m.unit)}</b></div>`).join('')}</div>` : '<div class="empty">Nothing yet — add stock in Inventory.</div>';
 }

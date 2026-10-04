@@ -8,6 +8,10 @@ import * as purchases from './pages/purchases.js';
 import * as recipes from './pages/recipes.js';
 import * as batches from './pages/batches.js';
 import * as videos from './pages/videos.js';
+import * as sales from './pages/sales.js';
+import * as financial from './pages/financial.js';
+import * as curing from './pages/curing.js';
+import * as calculators from './pages/calculators.js';
 
 const APP_VERSION = CHANGELOG[0].version, APP_DATE = CHANGELOG[0].date;
 const PAGES = [
@@ -17,7 +21,10 @@ const PAGES = [
   { id: 'purchases', label: 'Purchases', mod: purchases },
   { id: 'recipes', label: 'Recipes', mod: recipes },
   { id: 'batches', label: 'Make a batch', mod: batches },
-  { id: 'sales', label: 'Sales', soon: true },
+  { id: 'curing', label: 'Curing', mod: curing },
+  { id: 'sales', label: 'Sales', mod: sales },
+  { id: 'financial', label: 'Financial', mod: financial },
+  { id: 'calculators', label: 'Calculators', mod: calculators },
   { id: 'videos', label: 'Videos', mod: videos },
   { id: 'settings', label: 'Settings', mod: settings },
   { id: 'maintenance', label: 'Maintenance', mod: maintenance },

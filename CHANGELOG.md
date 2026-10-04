@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.0 — 2026-10-04
+- Database v3: `sales.sale_no`, `sales.channel`, new `expenses` table.
+- Sales: multi-product sales (`SYYMMDD-NN`), price from product, stock check, cost snapshot per line, profit; delete puts stock back.
+- Expenses (non-stock money out) and Financial: period filter, money in/out, cash left, profit, gross margin, monthly in-vs-out chart (gap months filled, colour-blind-safe pair, hover + table view), top products, expenses list.
+- Curing page: countdown/progress, "Ready now".
+- Calculators: percentage formula → grams, fragrance load by product type, soap lye (NaOH/KOH).
+- Overview: sales this month, curing count, quick links.
+
 ## v0.5.0 — 2026-10-04
 - Purchases: multi-line purchases, new items/suppliers inline, invoice attachment (photo/PDF → R2, photos shrunk to 1600px), undo guarded against used stock. "Capture invoice (AI)" placeholder for v1.2.
 - Suppliers API.
