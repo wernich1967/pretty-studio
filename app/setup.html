@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pretty Studio — setup check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+ body{margin:0;background:#f5f9f9;color:#2f3d42;font-family:"Source Sans 3",system-ui,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+ .card{background:#fff;border:1px solid #e0ebea;border-radius:18px;padding:36px 40px;max-width:460px;width:100%;text-align:center}
+ img{width:170px;mix-blend-mode:multiply}
+ h1{font:500 26px "Cormorant Garamond",serif;margin:18px 0 4px}
+ p.sub{color:#62777e;margin:0 0 24px;font-size:14px}
+ ul{list-style:none;padding:0;margin:0;text-align:left}
+ li{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid #e0ebea;font-size:15px}
+ .ok{color:#2a6769;font-weight:600}.bad{color:#c25d6c;font-weight:600}
+ .ver{margin-top:22px;font-size:11.5px;color:#97aeb2}
+</style></head>
+<body><div class="card">
+ <img src="pretty-logo.png" alt="Pretty">
+ <h1>Setup check</h1>
+ <p class="sub">The full app replaces this page once the setup is confirmed.</p>
+ <ul id="list"><li>Checking…</li></ul>
+ <div class="ver" id="ver"></div>
+</div>
+<script>
+fetch('/api/health').then(r => r.json()).then(d => {
+  const row = (label, val) => `<li><span>${label}</span><span class="${val === 'ok' ? 'ok' : 'bad'}">${val === 'ok' ? '✓ Connected' : val}</span></li>`;
+  document.getElementById('list').innerHTML =
+    row('App online', 'ok') + row('Database (D1)', d.database) + row('File storage (R2)', d.files) +
+    `<li><span>Signed in as</span><span>${d.user}</span></li>` +
+    (d.tables ? `<li><span>Database tables</span><span>${d.tables} (schema v${d.schemaVersion})</span></li>` : '');
+  document.getElementById('ver').textContent = 'Version ' + d.version + ' · ' + d.date;
+}).catch(e => { document.getElementById('list').innerHTML = '<li><span>App online</span><span class="bad">API not reachable</span></li>'; });
+</script>
+</body></html>
