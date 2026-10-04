@@ -38,7 +38,7 @@ async function form(pre = null) {
       <div class="field"><label>Supplier</label><input id="sup" list="supList" placeholder="Type or pick a supplier"><datalist id="supList">${sups.map(s => `<option value="${esc(s.name)}">`).join('')}</datalist></div>
       <div class="field"><label>Date</label><input id="date" type="date" value="${today()}"></div>
       <div class="field"><label>Invoice / receipt number</label><input id="inv"></div>
-      <div class="field"><label>Attach invoice (photo or PDF)</label>${pre?.file ? '<div class="note" style="padding:10px 0">📎 The invoice you captured will be attached.</div>' : '<input id="file" type="file" accept="image/*,application/pdf">'}</div>
+      <div class="field"><label>Attach invoice (photo or PDF)</label>${pre?.files?.length ? `<div class="note" style="padding:10px 0">📎 The ${pre.files.length > 1 ? pre.files.length + ' pages' : 'invoice'} you captured will be attached.</div>` : '<input id="file" type="file" accept="image/*,application/pdf">'}</div>
     </div>
     <label>Items bought</label>
     <div id="lines"></div>
@@ -98,8 +98,8 @@ async function form(pre = null) {
     }
     e.target.disabled = true; e.target.textContent = 'Saving…';
     try {
-      const file = pre?.file || await readFile(card.querySelector('#file').files[0]);
-      const r = await api('/purchases', { method: 'POST', body: { supplier_name: card.querySelector('#sup').value, date: card.querySelector('#date').value, invoice_no: card.querySelector('#inv').value, notes: card.querySelector('#notes').value, lines, file, allow_duplicate: allowDup } });
+      const files = pre?.files?.length ? pre.files : [await readFile(card.querySelector('#file').files[0])].filter(Boolean);
+      const r = await api('/purchases', { method: 'POST', body: { supplier_name: card.querySelector('#sup').value, date: card.querySelector('#date').value, invoice_no: card.querySelector('#inv').value, notes: card.querySelector('#notes').value, lines, files, allow_duplicate: allowDup } });
       const delv = card.querySelector('#delv');
       if (delv?.checked) await api('/expenses', { method: 'POST', body: { date: card.querySelector('#date').value, amount: pre.delivery_fee, category: 'Courier', description: `Delivery — ${card.querySelector('#sup').value} ${card.querySelector('#inv').value}`.trim() } });
       closeModal(); toast(r.warning || 'Purchase saved — stock updated', !!r.warning); after();
@@ -108,13 +108,13 @@ async function form(pre = null) {
 }
 
 async function detail(id) {
-  const { purchase: p, lines } = await api('/purchases/' + id);
+  const { purchase: p, lines, files = [] } = await api('/purchases/' + id);
   const isImg = p.file_key && !/pdf/i.test(p.file_key);
   const card = modal(`<div class="row" style="justify-content:space-between;align-items:flex-start"><div><h2>${esc(p.supplier || 'Purchase')}</h2><div class="note">${esc(p.date)}${p.invoice_no ? ' · Invoice ' + esc(p.invoice_no) : ''}</div></div><div style="font:500 26px 'Cormorant Garamond',serif">${money(p.total)}</div></div>
     <table class="tbl" style="margin-top:12px"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Line total</th><th class="r">Per unit</th></tr></thead><tbody>
     ${lines.map(l => `<tr><td>${esc(l.material || l.description)}</td><td class="r">${qty(l.qty, l.unit)}</td><td class="r">${money(l.line_total)}</td><td class="r">${l.qty ? money(l.line_total / l.qty) : '—'}</td></tr>`).join('')}</tbody></table>
     ${p.notes ? `<p class="note">${esc(p.notes)}</p>` : ''}
-    <div style="margin-top:12px">${p.file_key ? `<a class="btn ghost small" href="/api/files/${encodeURIComponent(p.file_key)}" target="_blank">📎 Open attached invoice</a>` : `<label class="btn ghost small" style="text-transform:none;letter-spacing:0;color:var(--teal-d);margin:0">📎 Attach invoice<input type="file" id="att" accept="image/*,application/pdf" hidden></label>`}</div>
+    <div style="margin-top:12px">${files.length ? files.map((f, i) => `<a class="btn ghost small" style="margin:0 6px 6px 0" href="/api/files/${encodeURIComponent(f.key)}" target="_blank">📎 ${files.length > 1 ? 'Page ' + (i + 1) : 'Open attached invoice'}</a>`).join('') : `<label class="btn ghost small" style="text-transform:none;letter-spacing:0;color:var(--teal-d);margin:0">📎 Attach invoice<input type="file" id="att" accept="image/*,application/pdf" hidden></label>`}</div>
     <div class="row" style="justify-content:space-between;margin-top:18px"><button class="btn danger small" id="del">Delete purchase</button><button class="btn" data-close>Close</button></div>`);
   const att = card.querySelector('#att');
   if (att) att.onchange = async () => { await api(`/purchases/${id}/file`, { method: 'POST', body: { file: await readFile(att.files[0]), name: att.files[0].name } }); toast('Invoice attached'); detail(id); after(); };
@@ -129,7 +129,7 @@ function capture() {
   captureModal({ title: '✨ Capture invoice', endpoint: '/ai/invoice',
     intro: 'Take a photo of the invoice, upload the PDF, or paste the text from an email. The AI fills in the purchase — you check it before anything is saved.',
     textLabel: '…or paste the invoice text', textPlaceholder: 'Paste from an email or web order confirmation',
-    onResult: async (ai, file) => { const pre = await prepare(ai); pre.file = file; form(pre); } });
+    onResult: async (ai, files) => { const pre = await prepare(ai); pre.files = files; form(pre); } });
 }
 
 // Turn the AI's reading into purchase-form lines matched to Sian's inventory

@@ -4,6 +4,7 @@ export const CHANGELOG = [
     '✨ Capture recipe: drop a photo of a recipe card, a PDF, or paste a recipe — the AI fills in ingredients (linked to your inventory), amounts, method and notes for you to check.',
     'Recipes in percentages are converted to grams for the batch size.',
     'The captured photo becomes the recipe picture.',
+    'Capture several pages at once (paste or drop one after another, up to 8) and remove a wrong one with ✕. Multi-page invoices keep every page attached.',
     'Duplicate check for recipes — warns if you already have a recipe with the same or a very similar name.'
   ]},
   { version: '0.7.0', date: '2026-10-04', items: [

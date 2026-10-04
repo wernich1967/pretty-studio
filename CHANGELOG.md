@@ -1,6 +1,7 @@
 # Changelog
 
 ## v0.8.0 — 2026-10-04
+- Multi-page capture: up to 8 pages (drop/choose/paste repeatedly), thumbnails with ✕ remove; AI endpoints accept `files: []` (legacy `file` still works) and are told the pages are one document; purchases store every page (`invoice-<id>`, `invoice-<id>-pN`) and list them; delete removes all pages.
 - ✨ AI recipe capture (`POST /api/ai/recipe`, tool `record_recipe`): ingredients matched to inventory, %→grams conversion flagged, method/notes/uncertain, captured photo becomes the recipe image. Logged as feature `recipe-capture`.
 - Recipe duplicate check (`similarRecipes`: same normalised name, "&"="and", or ≥75% word overlap); `POST /api/recipes/check`; save returns 409 unless `allow_duplicate`.
 - Shared capture window `app/capture.js` (drop / click / paste / text) used by invoices and recipes.

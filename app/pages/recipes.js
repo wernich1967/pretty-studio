@@ -20,7 +20,7 @@ export async function after() {
   $('#aiR').onclick = () => captureModal({ title: '✨ Capture recipe', endpoint: '/ai/recipe',
     intro: 'Drop a photo of a recipe card, a PDF, or paste a recipe from a website. The AI fills in the recipe — you check it before saving.',
     textLabel: '…or paste the recipe text', textPlaceholder: 'Paste a recipe from a website or document',
-    onResult: async (ai, file) => {
+    onResult: async (ai, files) => {
       const [mats, cats] = await Promise.all([api('/materials'), categories('product')]);
       const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
       const cat = cats.find(c => c.active && norm(c.name) === norm(ai.category));
@@ -29,7 +29,7 @@ export async function after() {
         return { material_id: m ? m.id : '', description: m ? '' : i.name, qty: i.quantity, unit: ['g', 'kg', 'ml', 'l', 'each', 'pack'].includes(i.unit) ? i.unit : 'g' };
       });
       form({ name: ai.name, category_id: cat ? cat.id : '', yield_qty: ai.yield_qty, yield_unit: ai.yield_unit || 'g', method: ai.method, notes: ai.notes }, lines,
-        { uncertain: ai.uncertain, was_percentage: ai.was_percentage, image: file && file.startsWith('data:image/') ? file : null, unmatched: lines.filter(l => !l.material_id).length });
+        { uncertain: ai.uncertain, was_percentage: ai.was_percentage, image: files.find(f => f.startsWith('data:image/')) || null, unmatched: lines.filter(l => !l.material_id).length });
     } });
   draw();
 }
