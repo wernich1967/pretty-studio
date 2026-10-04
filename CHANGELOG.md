@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.8.0 — 2026-10-04
+- ✨ AI recipe capture (`POST /api/ai/recipe`, tool `record_recipe`): ingredients matched to inventory, %→grams conversion flagged, method/notes/uncertain, captured photo becomes the recipe image. Logged as feature `recipe-capture`.
+- Recipe duplicate check (`similarRecipes`: same normalised name, "&"="and", or ≥75% word overlap); `POST /api/recipes/check`; save returns 409 unless `allow_duplicate`.
+- Shared capture window `app/capture.js` (drop / click / paste / text) used by invoices and recipes.
+
 ## v0.7.0 — 2026-10-04
 - Duplicate purchase detection: `findDuplicates` (normalised invoice no. + supplier; or supplier + date + total ±R1). `POST /api/purchases/check`; `POST /api/purchases` returns 409 unless `allow_duplicate`. Warning shown on AI review and on save with "save anyway".
 - Capture window: drag-and-drop, Ctrl+V screenshot paste, no forced camera on phones; stray drops no longer navigate away.

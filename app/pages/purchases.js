@@ -1,3 +1,4 @@
+import { captureModal } from '../capture.js';
 import { api, toast, modal, closeModal, esc, money, qty, today, UNITS, options, categories, readFile, convert, $ } from '../core.js';
 
 export function render() {
@@ -125,41 +126,10 @@ async function detail(id) {
 
 // ---------- ✨ AI invoice capture ----------
 function capture() {
-  const card = modal(`<h2>✨ Capture invoice</h2>
-    <p class="note" style="margin-top:-4px">Take a photo of the invoice, upload the PDF, or paste the text from an email. The AI fills in the purchase — you check it before anything is saved.</p>
-    <label class="drop" id="drop"><input type="file" id="cf" accept="image/*,application/pdf" hidden><span id="dropTxt">📄 Drop the invoice here, click to choose a file, or press Ctrl+V to paste a screenshot<br><span class="note">On a phone: tap to take a photo or pick one · JPG, PNG or PDF</span></span></label>
-    <div class="field" style="margin-top:12px"><label>…or paste the invoice text</label><textarea id="ct" rows="4" placeholder="Paste from an email or web order confirmation"></textarea></div>
-    <div id="cmsg" class="note"></div>
-    <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn ghost" id="cc">Cancel</button><button class="btn" id="go">Read invoice</button></div>`);
-  let file = null;
-  const cf = card.querySelector('#cf');
-  const drop = card.querySelector('#drop');
-  const take = async f => {
-    if (!f) return;
-    if (!/^image\/|application\/pdf/.test(f.type)) return card.querySelector('#dropTxt').innerHTML = 'That file type isn\'t supported — use a photo (JPG/PNG) or a PDF.';
-    if (f.type === 'application/pdf' && f.size > 4 * 1024 * 1024) { file = null; return card.querySelector('#dropTxt').innerHTML = 'That PDF is over 4 MB — take a photo of it instead.'; }
-    file = await readFile(f);
-    card.querySelector('#dropTxt').innerHTML = f.type.startsWith('image/') ? `<img src="${file}" style="max-height:160px;border-radius:8px"><br><span class="note">${esc(f.name || 'Pasted screenshot')} · click to change</span>` : `📄 ${esc(f.name)} <span class="note">· click to change</span>`;
-  };
-  cf.onchange = () => take(cf.files[0]);
-  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
-  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-  drop.addEventListener('drop', e => take(e.dataTransfer.files[0]));
-  const onPaste = e => { const it = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/')); if (it) { e.preventDefault(); take(it.getAsFile()); } };
-  document.addEventListener('paste', onPaste);
-  const stop = () => document.removeEventListener('paste', onPaste);
-  new MutationObserver((m, o) => { if (document.getElementById('modal').hidden || !card.querySelector('#drop')) { stop(); o.disconnect(); } }).observe(document.getElementById('modal'), { attributes: true, childList: true, subtree: true });
-  card.querySelector('#cc').onclick = closeModal;
-  card.querySelector('#go').onclick = async e => {
-    const text = card.querySelector('#ct').value.trim();
-    if (!file && text.length < 10) return toast('Add a photo, PDF or paste the text first', true);
-    e.target.disabled = true; card.querySelector('#cmsg').innerHTML = '<span class="spin"></span> Reading the invoice… this takes 10–30 seconds.';
-    try {
-      const ai = await api('/ai/invoice', { method: 'POST', body: file ? { file } : { text } });
-      const pre = await prepare(ai); pre.file = file;
-      form(pre);
-    } catch (err) { e.target.disabled = false; card.querySelector('#cmsg').textContent = err.message === 'login' ? '' : 'Could not read it: ' + (err.message || 'unknown error'); }
-  };
+  captureModal({ title: '✨ Capture invoice', endpoint: '/ai/invoice',
+    intro: 'Take a photo of the invoice, upload the PDF, or paste the text from an email. The AI fills in the purchase — you check it before anything is saved.',
+    textLabel: '…or paste the invoice text', textPlaceholder: 'Paste from an email or web order confirmation',
+    onResult: async (ai, file) => { const pre = await prepare(ai); pre.file = file; form(pre); } });
 }
 
 // Turn the AI's reading into purchase-form lines matched to Sian's inventory

@@ -1,5 +1,11 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.8.0', date: '2026-10-04', items: [
+    '✨ Capture recipe: drop a photo of a recipe card, a PDF, or paste a recipe — the AI fills in ingredients (linked to your inventory), amounts, method and notes for you to check.',
+    'Recipes in percentages are converted to grams for the batch size.',
+    'The captured photo becomes the recipe picture.',
+    'Duplicate check for recipes — warns if you already have a recipe with the same or a very similar name.'
+  ]},
   { version: '0.7.0', date: '2026-10-04', items: [
     '✨ Capture invoice: take a photo, upload a PDF or paste the text of a supplier invoice — the AI fills in the purchase, matches lines to your inventory, and you check it before saving.',
     'Lines the AI is unsure about are highlighted, and new items are suggested with a category.',

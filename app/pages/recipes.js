@@ -1,7 +1,8 @@
+import { captureModal } from '../capture.js';
 import { api, toast, modal, closeModal, esc, money, qty, UNITS, options, categories, readFile, convert, approx, $ } from '../core.js';
 
 export function render() {
-  return `<div class="head"><div><h1>Recipes</h1><div class="sub">Your formulas — with live cost per batch from what you actually paid.</div></div><button class="btn" id="addR">+ New recipe</button></div>
+  return `<div class="head"><div><h1>Recipes</h1><div class="sub">Your formulas — with live cost per batch from what you actually paid.</div></div><div class="row"><button class="btn ghost" id="aiR">✨ Capture recipe (AI)</button><button class="btn" id="addR">+ New recipe</button></div></div>
     <div class="card"><div class="row" style="margin-bottom:14px"><input id="q" placeholder="Search recipes…"></div><div id="grid" class="rgrid"><div class="empty">Loading…</div></div></div>`;
 }
 export async function after() {
@@ -16,6 +17,20 @@ export async function after() {
   };
   $('#q').oninput = e => draw(e.target.value);
   $('#addR').onclick = () => form();
+  $('#aiR').onclick = () => captureModal({ title: '✨ Capture recipe', endpoint: '/ai/recipe',
+    intro: 'Drop a photo of a recipe card, a PDF, or paste a recipe from a website. The AI fills in the recipe — you check it before saving.',
+    textLabel: '…or paste the recipe text', textPlaceholder: 'Paste a recipe from a website or document',
+    onResult: async (ai, file) => {
+      const [mats, cats] = await Promise.all([api('/materials'), categories('product')]);
+      const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+      const cat = cats.find(c => c.active && norm(c.name) === norm(ai.category));
+      const lines = (ai.ingredients || []).map(i => {
+        const m = (i.match && mats.find(x => norm(x.name) === norm(i.match))) || mats.find(x => norm(x.name) === norm(i.name));
+        return { material_id: m ? m.id : '', description: m ? '' : i.name, qty: i.quantity, unit: ['g', 'kg', 'ml', 'l', 'each', 'pack'].includes(i.unit) ? i.unit : 'g' };
+      });
+      form({ name: ai.name, category_id: cat ? cat.id : '', yield_qty: ai.yield_qty, yield_unit: ai.yield_unit || 'g', method: ai.method, notes: ai.notes }, lines,
+        { uncertain: ai.uncertain, was_percentage: ai.was_percentage, image: file && file.startsWith('data:image/') ? file : null, unmatched: lines.filter(l => !l.material_id).length });
+    } });
   draw();
 }
 
@@ -45,10 +60,16 @@ async function detail(id) {
   };
 }
 
-async function form(r = {}, lines = []) {
+async function form(r = {}, lines = [], ai = null) {
   const [mats, prods, cats] = await Promise.all([api('/materials'), api('/products'), categories('product')]);
   const matOpts = sel => `<option value="">— not linked (free text) —</option>${mats.map(m => `<option value="${m.id}" ${m.id === sel ? 'selected' : ''}>${esc(m.name)} (${esc(m.unit)})</option>`).join('')}`;
-  const card = modal(`<h2>${r.id ? 'Edit recipe' : 'New recipe'}</h2>
+  const card = modal(`<h2>${ai ? '✨ Check the AI\'s reading' : r.id ? 'Edit recipe' : 'New recipe'}</h2>
+    ${ai ? `<div class="box aibox"><b>Filled in by AI — please check every ingredient and amount before saving.</b>
+      ${ai.was_percentage ? `<div class="note" style="margin-top:4px">The recipe was in percentages — amounts were converted to grams for a ${esc(r.yield_qty || 500)} ${esc(r.yield_unit || 'g')} batch.</div>` : ''}
+      ${ai.unmatched ? `<div class="note">${ai.unmatched} ingredient(s) aren't linked to your inventory yet — pick the stock item from the list, or leave them as free text.</div>` : ''}
+      ${ai.uncertain ? `<div class="note">AI note: ${esc(ai.uncertain)}</div>` : ''}
+      ${ai.image ? '<div class="note">📷 The photo you captured will be used as the recipe picture.</div>' : ''}</div>` : ''}
+    <div id="rdup"></div>
     <div class="grid2">
       <div class="field"><label>Recipe name</label><input id="name" value="${esc(r.name)}"></div>
       <div class="field"><label>Category</label><select id="cat">${options(cats.filter(c => c.active || c.id === r.category_id).map(c => ({ value: c.id, label: c.name })), r.category_id, '— choose —')}</select></div>
@@ -62,6 +83,9 @@ async function form(r = {}, lines = []) {
     <div class="field"><label>Photo</label><input id="img" type="file" accept="image/*"></div>
     <div class="row" style="justify-content:flex-end"><button class="btn ghost" id="cancel">Cancel</button><button class="btn" id="save">Save recipe</button></div>`);
   card.classList.add('wide');
+  let allowDup = false;
+  const dupBox = d => `<div class="box dupbox">⚠ <b>You may already have this recipe:</b><ul>${d.map(x => `<li>${esc(x.name)} <span class="note">(${esc(x.reason)})</span></li>`).join('')}</ul></div>`;
+  if (ai && r.name) api('/recipes/check', { method: 'POST', body: { name: r.name } }).then(x => { if (x.duplicates.length) $('#rdup').innerHTML = dupBox(x.duplicates); }).catch(() => { });
   const add = (l = {}) => {
     const d = document.createElement('div'); d.className = 'pline';
     d.innerHTML = `<select class="mat">${matOpts(l.material_id)}</select><input class="desc" placeholder="Ingredient name" value="${esc(l.material_id ? '' : l.description)}" ${l.material_id ? 'hidden' : ''}>
@@ -76,9 +100,18 @@ async function form(r = {}, lines = []) {
   card.querySelector('#save').onclick = async e => {
     const body = { name: $('#name').value, category_id: $('#cat').value, product_id: $('#prod').value, yield_qty: $('#yq').value, yield_unit: $('#yu').value, method: $('#method').value, notes: $('#notes').value,
       lines: [...card.querySelectorAll('.pline')].map(d => ({ material_id: d.querySelector('.mat').value, description: d.querySelector('.desc').value, qty: d.querySelector('.q').value, unit: d.querySelector('.u').value })) };
+    if (!allowDup) {
+      const d = (await api('/recipes/check', { method: 'POST', body: { name: body.name, id: r.id } }).catch(() => ({ duplicates: [] }))).duplicates;
+      if (d.length) {
+        $('#rdup').innerHTML = dupBox(d) + `<div class="row" style="justify-content:flex-end;margin:-6px 0 12px"><button class="btn ghost small" id="rdNo">Don't save</button><button class="btn small danger" id="rdYes">It's a different recipe — save anyway</button></div>`;
+        $('#rdNo').onclick = closeModal; $('#rdYes').onclick = () => { allowDup = true; $('#rdup').innerHTML = ''; card.querySelector('#save').click(); };
+        card.scrollTop = 0; return;
+      }
+    }
     e.target.disabled = true;
     try {
-      body.image = await readFile($('#img').files[0]);
+      body.image = $('#img').files[0] ? await readFile($('#img').files[0]) : (ai?.image || null);
+      body.allow_duplicate = allowDup;
       const x = await api(r.id ? '/recipes/' + r.id : '/recipes', { method: r.id ? 'PUT' : 'POST', body });
       toast('Recipe saved'); await after(); detail(x.id || r.id);
     } catch { e.target.disabled = false; }
