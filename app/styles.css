@@ -114,3 +114,5 @@ details summary{cursor:pointer}
 .drop:hover,.drop.over{background:var(--teal-l);border-color:var(--teal)}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line2);border-top-color:var(--teal);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
+
+.dupbox{background:#fdf1e3;border:1px solid #efc98f;color:#7a4e12}.dupbox ul{margin:6px 0 0;padding-left:18px}

@@ -1,6 +1,7 @@
 # Changelog
 
 ## v0.7.0 — 2026-10-04
+- Duplicate purchase detection: `findDuplicates` (normalised invoice no. + supplier; or supplier + date + total ±R1). `POST /api/purchases/check`; `POST /api/purchases` returns 409 unless `allow_duplicate`. Warning shown on AI review and on save with "save anyway".
 - Capture window: drag-and-drop, Ctrl+V screenshot paste, no forced camera on phones; stray drops no longer navigate away.
 - Fix: newer models reject forced `tool_choice` ("tool"/"any") — now `auto` + instruction, with a text-JSON fallback.
 - ✨ AI invoice capture (`POST /api/ai/invoice`): photo/PDF/pasted text → Claude (default `claude-sonnet-5-5`, override with env `AI_MODEL`) via forced tool call `record_invoice`; lines matched to inventory, unit-converted, uncertain/new lines flagged; prefilled purchase form for review; captured file attached; optional delivery → Courier expense.

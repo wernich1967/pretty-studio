@@ -6,6 +6,7 @@ export const CHANGELOG = [
     'The captured invoice is attached to the purchase automatically.',
     'Maintenance shows AI usage — calls and cost per month.',
     'Settings: choose the AI model — Sonnet (most accurate) or Haiku (cheapest).',
+    'Duplicate check: warns if an invoice was already recorded (same invoice number from the same supplier, or same supplier, date and total) — before you save.',
     'Capture invoice: drag & drop a file, or press Ctrl+V to paste a screenshot. On a phone you can pick camera or gallery.'
   ]},
   { version: '0.6.0', date: '2026-10-04', items: [

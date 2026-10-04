@@ -43,8 +43,14 @@ async function form(pre = null) {
     <div id="lines"></div>
     <button class="btn ghost small" id="addLine" style="margin:6px 0 14px">+ Add line</button>
     <div class="field"><label>Notes</label><input id="notes"></div>
+    <div id="dup"></div>
     <div class="row" style="justify-content:space-between"><b id="tot">Total: R 0.00</b><div class="row"><button class="btn ghost" id="cancel">Cancel</button><button class="btn" id="save">Save purchase</button></div></div>`);
   card.classList.add('wide');
+  let allowDup = false;
+  const dupHtml = d => `<div class="box dupbox">⚠ <b>This looks like a duplicate</b> of ${d.length > 1 ? 'purchases' : 'a purchase'} already recorded:<ul>${d.map(x => `<li>${esc(x.supplier || 'No supplier')} · ${esc(x.date)} · ${x.invoice_no ? 'invoice ' + esc(x.invoice_no) : 'no invoice no.'} · ${money(x.total)} <span class="note">(${esc(x.reason)})</span></li>`).join('')}</ul></div>`;
+  const values = () => ({ supplier_name: card.querySelector('#sup').value, invoice_no: card.querySelector('#inv').value, date: card.querySelector('#date').value,
+    total: [...card.querySelectorAll('.pline .t')].reduce((a, i) => a + (Number(i.value) || 0), 0) });
+  const checkDup = async () => (await api('/purchases/check', { method: 'POST', body: values() })).duplicates;
   const addLine = (init = {}) => {
     const d = document.createElement('div'); d.className = 'pline' + (init.flag ? ' flag' : '');
     d.innerHTML = `<select class="mat">${matOpts}</select>
@@ -68,6 +74,7 @@ async function form(pre = null) {
     card.querySelector('#sup').value = pre.supplier_name || ''; card.querySelector('#inv').value = pre.invoice_number || '';
     if (/^\d{4}-\d{2}-\d{2}$/.test(pre.date || '')) card.querySelector('#date').value = pre.date;
     pre.lines.forEach(addLine); total();
+    checkDup().then(d => { if (d.length) card.querySelector('.aibox').insertAdjacentHTML('afterend', dupHtml(d)); }).catch(() => { });
   } else { addLine(); addLine(); }
   card.querySelector('#cancel').onclick = closeModal;
   card.querySelector('#save').onclick = async e => {
@@ -78,10 +85,20 @@ async function form(pre = null) {
       return l;
     }).filter(l => (l.material_id || l.new_material?.name) && Number(l.qty) > 0);
     if (!lines.length) return toast('Add at least one item with a quantity', true);
+    if (!allowDup) {
+      const d = await checkDup().catch(() => []);
+      if (d.length) {
+        card.querySelector('#dup').innerHTML = dupHtml(d) + `<div class="row" style="justify-content:flex-end;margin:-6px 0 12px"><button class="btn ghost small" id="dupNo">Don't save</button><button class="btn small danger" id="dupYes">It's a different invoice — save anyway</button></div>`;
+        card.querySelector('#dupNo').onclick = closeModal;
+        card.querySelector('#dupYes').onclick = () => { allowDup = true; card.querySelector('#dup').innerHTML = ''; card.querySelector('#save').click(); };
+        card.querySelector('#dup').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
     e.target.disabled = true; e.target.textContent = 'Saving…';
     try {
       const file = pre?.file || await readFile(card.querySelector('#file').files[0]);
-      const r = await api('/purchases', { method: 'POST', body: { supplier_name: card.querySelector('#sup').value, date: card.querySelector('#date').value, invoice_no: card.querySelector('#inv').value, notes: card.querySelector('#notes').value, lines, file } });
+      const r = await api('/purchases', { method: 'POST', body: { supplier_name: card.querySelector('#sup').value, date: card.querySelector('#date').value, invoice_no: card.querySelector('#inv').value, notes: card.querySelector('#notes').value, lines, file, allow_duplicate: allowDup } });
       const delv = card.querySelector('#delv');
       if (delv?.checked) await api('/expenses', { method: 'POST', body: { date: card.querySelector('#date').value, amount: pre.delivery_fee, category: 'Courier', description: `Delivery — ${card.querySelector('#sup').value} ${card.querySelector('#inv').value}`.trim() } });
       closeModal(); toast(r.warning || 'Purchase saved — stock updated', !!r.warning); after();
