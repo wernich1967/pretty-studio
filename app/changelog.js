@@ -1,5 +1,14 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.5.0', date: '2026-10-04', items: [
+    'Purchases: record what you buy (several items per invoice), attach the invoice photo or PDF — stock goes up automatically.',
+    'New items and suppliers can be added straight from a purchase.',
+    'Recipes: photos, ingredients linked to inventory, method & notes, and the estimated cost per batch from what you actually paid.',
+    'Make a batch: takes ingredients out of stock, adds finished products, gives each batch a number, curing and best-before dates, and works out the cost per item.',
+    'Undo a purchase or batch safely — it refuses if that stock has already been used or sold.',
+    'Videos: save tutorial links (YouTube plays right inside the studio), grouped by topic.',
+    'The ✨ Capture invoice (AI) button is in place, ready for version 1.2.'
+  ]},
   { version: '0.4.0', date: '2026-10-04', items: [
     'Inventory: ingredients, packaging and supplies with opening stock, reorder levels, average cost and full stock history.',
     'Finished products: stock, cost to make, selling price, product code and stock value.',

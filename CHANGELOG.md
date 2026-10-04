@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.0 — 2026-10-04
+- Purchases: multi-line purchases, new items/suppliers inline, invoice attachment (photo/PDF → R2, photos shrunk to 1600px), undo guarded against used stock. "Capture invoice (AI)" placeholder for v1.2.
+- Suppliers API.
+- Recipes: photo, lines linked to materials (or free text), method/notes, estimated batch cost from average purchase cost (g≈ml flagged).
+- Make a batch: multiplier, per-line "take from stock" in the material's unit, pick stock items for unlinked lines, stock check, batch number `BYYMMDD-NN`, curing/ready and best-before dates, cost per item, optional product cost update; undo guarded against sold stock.
+- Videos page (YouTube embedded).
+- Shared `lib/files.js` for R2 uploads.
+
 ## v0.4.0 — 2026-10-04
 - Database v2: `source` column on all data tables ('live' / 'test').
 - Inventory (materials) and Finished products: list, search, category filter, add/edit with opening stock, adjust stock (can't go below zero), history, archive-or-delete. Stock = SUM(stock_movements); avg cost from opening/purchase movements.
