@@ -16,6 +16,7 @@ export function render() {
     <div class="card"><h2>Product categories</h2><p class="note" style="margin-top:-6px">What you sell — e.g. Hair Oil, Shampoo, Perfume.</p><div id="cat-product"></div></div>
     <div class="card"><h2>Material categories</h2><p class="note" style="margin-top:-6px">What you buy — ingredients, packaging, labels…</p><div id="cat-material"></div></div>
   </div>
+  <div class="card"><h2>✨ AI invoice reading</h2><div id="aiSet"><div class="empty">Loading…</div></div></div>
   <div class="card"><h2>Account</h2><p class="note" style="margin:0">Signed in as <b>${esc(state.me?.email)}</b>. ${state.me?.strictLogin ? 'Full login check is on.' : 'Login is checked at the front door.'}</p></div>`;
 }
 
@@ -26,6 +27,7 @@ export async function after(ctx) {
     state.me.business = await api('/settings/business', { method: 'PUT', body: { name: $('#bName').value, ownerName: $('#bOwner').value, phone: $('#bPhone').value, email: $('#bEmail').value, address: $('#bAddr').value } });
     ctx.renderNav(); toast('Details saved');
   };
+  aiSettings();
   await Promise.all(['product', 'material'].map(renderCats));
 }
 
@@ -72,4 +74,12 @@ async function renderCats(kind) {
       no.onclick = ev => { ev.stopPropagation(); renderCats(kind); };
     }
   }));
+}
+
+async function aiSettings() {
+  const a = await api('/ai/settings');
+  $('#aiSet').innerHTML = `<div class="row" style="flex-wrap:wrap"><label style="margin:0">Model</label>
+    <select id="aiModel" style="max-width:320px">${Object.entries(a.models).map(([k, v]) => `<option value="${k}" ${k === a.model ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select></div>
+    <p class="note" style="margin-bottom:0">Sonnet reads messy photos and long invoices more reliably; Haiku costs about half and is fine for clear printed invoices. ${a.ready ? '' : '<b>AI is not switched on yet</b> — the API key still needs to be added in Cloudflare.'}</p>`;
+  $('#aiModel').onchange = async e => { await api('/ai/settings', { method: 'PUT', body: { model: e.target.value } }); toast('AI model saved'); };
 }
