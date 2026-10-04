@@ -1,5 +1,11 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.7.0', date: '2026-10-04', items: [
+    '✨ Capture invoice: take a photo, upload a PDF or paste the text of a supplier invoice — the AI fills in the purchase, matches lines to your inventory, and you check it before saving.',
+    'Lines the AI is unsure about are highlighted, and new items are suggested with a category.',
+    'The captured invoice is attached to the purchase automatically.',
+    'Maintenance shows AI usage — calls and cost per month.'
+  ]},
   { version: '0.6.0', date: '2026-10-04', items: [
     'Sales: record sales with several products, prices fill in from the product, stock goes down and profit is worked out per sale.',
     'Financial: money in vs money out by month, cash left, profit, gross margin and best products — for this month, last month, this year or all time.',

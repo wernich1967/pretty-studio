@@ -1,8 +1,8 @@
-import { api, toast, modal, closeModal, esc, money, qty, today, UNITS, options, categories, readFile, $ } from '../core.js';
+import { api, toast, modal, closeModal, esc, money, qty, today, UNITS, options, categories, readFile, convert, $ } from '../core.js';
 
 export function render() {
   return `<div class="head"><div><h1>Purchases</h1><div class="sub">Everything that comes into the studio. Saving a purchase adds the stock to Inventory.</div></div>
-    <div class="row"><button class="btn ghost" id="aiBtn" title="Coming in version 1.2">✨ Capture invoice (AI)</button><button class="btn" id="addP">+ Record a purchase</button></div></div>
+    <div class="row"><button class="btn ghost" id="aiBtn">✨ Capture invoice (AI)</button><button class="btn" id="addP">+ Record a purchase</button></div></div>
     <div class="tiles" id="tiles"></div>
     <div class="card"><div class="row" style="margin-bottom:14px"><input id="q" placeholder="Search supplier, invoice number…"></div><div id="table"><div class="empty">Loading…</div></div></div>`;
 }
@@ -23,19 +23,21 @@ export async function after() {
   };
   $('#q').oninput = e => draw(e.target.value);
   $('#addP').onclick = () => form();
-  $('#aiBtn').onclick = () => modal(`<h2>✨ Capture invoice</h2><p>Soon you'll be able to snap a photo of a supplier invoice or paste its text here — the AI fills in the supplier, invoice number, date and every line for you to check before saving.</p><p class="note">Coming in version 1.2. For now, use “Record a purchase”.</p><div style="text-align:right"><button class="btn" data-close>OK</button></div>`);
+  $('#aiBtn').onclick = capture;
   draw();
 }
 
-async function form() {
+async function form(pre = null) {
   const [mats, sups, cats] = await Promise.all([api('/materials'), api('/suppliers'), categories('material')]);
   const matOpts = `<option value="">— choose item —</option>${mats.map(m => `<option value="${m.id}" data-unit="${esc(m.unit)}">${esc(m.name)} (${esc(m.unit)})</option>`).join('')}<option value="__new">+ New item…</option>`;
-  const card = modal(`<h2>Record a purchase</h2>
+  const card = modal(`<h2>${pre ? '✨ Check the AI\'s reading' : 'Record a purchase'}</h2>
+    ${pre ? `<div class="box aibox"><b>Filled in by AI — please check every line before saving.</b>${pre.notes ? `<div class="note" style="margin-top:4px">AI note: ${esc(pre.notes)}</div>` : ''}${pre.total ? `<div class="note">Invoice total: ${money(pre.total)}${pre.delivery_fee ? ' (incl. delivery ' + money(pre.delivery_fee) + ')' : ''}</div>` : ''}
+      ${pre.delivery_fee > 0 ? `<label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:14px;color:var(--text);margin:8px 0 0"><input type="checkbox" id="delv" checked style="width:auto"> Record the ${money(pre.delivery_fee)} delivery as an expense (Courier)</label>` : ''}</div>` : ''}
     <div class="grid2">
       <div class="field"><label>Supplier</label><input id="sup" list="supList" placeholder="Type or pick a supplier"><datalist id="supList">${sups.map(s => `<option value="${esc(s.name)}">`).join('')}</datalist></div>
       <div class="field"><label>Date</label><input id="date" type="date" value="${today()}"></div>
       <div class="field"><label>Invoice / receipt number</label><input id="inv"></div>
-      <div class="field"><label>Attach invoice (photo or PDF)</label><input id="file" type="file" accept="image/*,application/pdf"></div>
+      <div class="field"><label>Attach invoice (photo or PDF)</label>${pre?.file ? '<div class="note" style="padding:10px 0">📎 The invoice you captured will be attached.</div>' : '<input id="file" type="file" accept="image/*,application/pdf">'}</div>
     </div>
     <label>Items bought</label>
     <div id="lines"></div>
@@ -43,19 +45,30 @@ async function form() {
     <div class="field"><label>Notes</label><input id="notes"></div>
     <div class="row" style="justify-content:space-between"><b id="tot">Total: R 0.00</b><div class="row"><button class="btn ghost" id="cancel">Cancel</button><button class="btn" id="save">Save purchase</button></div></div>`);
   card.classList.add('wide');
-  const addLine = () => {
-    const d = document.createElement('div'); d.className = 'pline';
+  const addLine = (init = {}) => {
+    const d = document.createElement('div'); d.className = 'pline' + (init.flag ? ' flag' : '');
     d.innerHTML = `<select class="mat">${matOpts}</select>
       <div class="newmat" hidden><input class="nm" placeholder="New item name"><select class="nu">${options(UNITS.map(u => ({ value: u, label: u })), 'g')}</select><select class="nc">${options(cats.filter(c => c.active).map(c => ({ value: c.id, label: c.name })), '', 'Category')}</select></div>
       <input class="q" type="number" step="any" placeholder="Qty"><span class="u note">—</span><input class="t" type="number" step="any" placeholder="Line total R"><button class="icon-btn rm" title="Remove">✕</button>`;
     $('#lines').appendChild(d);
     const sel = d.querySelector('.mat');
     sel.onchange = () => { const nw = sel.value === '__new'; d.querySelector('.newmat').hidden = !nw; d.querySelector('.u').textContent = nw ? '' : (sel.selectedOptions[0].dataset.unit || '—'); };
+    if (init.material_id) sel.value = init.material_id;
+    if (init.new_material) { sel.value = '__new'; d.querySelector('.nm').value = init.new_material.name; d.querySelector('.nu').value = init.new_material.unit; if (init.new_material.category_id) d.querySelector('.nc').value = init.new_material.category_id; }
+    if (init.qty != null) d.querySelector('.q').value = init.qty;
+    if (init.line_total != null) d.querySelector('.t').value = init.line_total;
+    if (init.flag) { const f = document.createElement('div'); f.className = 'note flagnote'; f.textContent = init.flag; d.appendChild(f); }
+    sel.onchange();
     d.querySelector('.rm').onclick = () => { d.remove(); total(); };
     d.querySelector('.t').oninput = total;
   };
   const total = () => card.querySelector('#tot').textContent = 'Total: ' + money([...card.querySelectorAll('.pline .t')].reduce((a, i) => a + (Number(i.value) || 0), 0));
-  card.querySelector('#addLine').onclick = addLine; addLine(); addLine();
+  card.querySelector('#addLine').onclick = () => addLine();
+  if (pre) {
+    card.querySelector('#sup').value = pre.supplier_name || ''; card.querySelector('#inv').value = pre.invoice_number || '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(pre.date || '')) card.querySelector('#date').value = pre.date;
+    pre.lines.forEach(addLine); total();
+  } else { addLine(); addLine(); }
   card.querySelector('#cancel').onclick = closeModal;
   card.querySelector('#save').onclick = async e => {
     const lines = [...card.querySelectorAll('.pline')].map(d => {
@@ -67,8 +80,10 @@ async function form() {
     if (!lines.length) return toast('Add at least one item with a quantity', true);
     e.target.disabled = true; e.target.textContent = 'Saving…';
     try {
-      const file = await readFile(card.querySelector('#file').files[0]);
+      const file = pre?.file || await readFile(card.querySelector('#file').files[0]);
       const r = await api('/purchases', { method: 'POST', body: { supplier_name: card.querySelector('#sup').value, date: card.querySelector('#date').value, invoice_no: card.querySelector('#inv').value, notes: card.querySelector('#notes').value, lines, file } });
+      const delv = card.querySelector('#delv');
+      if (delv?.checked) await api('/expenses', { method: 'POST', body: { date: card.querySelector('#date').value, amount: pre.delivery_fee, category: 'Courier', description: `Delivery — ${card.querySelector('#sup').value} ${card.querySelector('#inv').value}`.trim() } });
       closeModal(); toast(r.warning || 'Purchase saved — stock updated', !!r.warning); after();
     } catch (err) { e.target.disabled = false; e.target.textContent = 'Save purchase'; }
   };
@@ -89,4 +104,53 @@ async function detail(id) {
     if (!this.dataset.sure) { this.dataset.sure = 1; this.textContent = 'Click again — this removes the stock too'; return; }
     api('/purchases/' + id, { method: 'DELETE' }).then(() => { closeModal(); toast('Purchase deleted'); after(); });
   };
+}
+
+// ---------- ✨ AI invoice capture ----------
+function capture() {
+  const card = modal(`<h2>✨ Capture invoice</h2>
+    <p class="note" style="margin-top:-4px">Take a photo of the invoice, upload the PDF, or paste the text from an email. The AI fills in the purchase — you check it before anything is saved.</p>
+    <label class="drop" id="drop"><input type="file" id="cf" accept="image/*,application/pdf" capture="environment" hidden><span id="dropTxt">📷 Tap to take a photo or choose a file<br><span class="note">JPG, PNG or PDF</span></span></label>
+    <div class="field" style="margin-top:12px"><label>…or paste the invoice text</label><textarea id="ct" rows="4" placeholder="Paste from an email or web order confirmation"></textarea></div>
+    <div id="cmsg" class="note"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn ghost" id="cc">Cancel</button><button class="btn" id="go">Read invoice</button></div>`);
+  let file = null;
+  const cf = card.querySelector('#cf');
+  cf.onchange = async () => {
+    const f = cf.files[0]; if (!f) return;
+    if (f.type === 'application/pdf' && f.size > 4 * 1024 * 1024) { file = null; return card.querySelector('#dropTxt').innerHTML = 'That PDF is over 4 MB — take a photo of it instead.'; }
+    file = await readFile(f);
+    card.querySelector('#dropTxt').innerHTML = f.type.startsWith('image/') ? `<img src="${file}" style="max-height:160px;border-radius:8px"><br><span class="note">${esc(f.name)}</span>` : `📄 ${esc(f.name)}`;
+  };
+  card.querySelector('#cc').onclick = closeModal;
+  card.querySelector('#go').onclick = async e => {
+    const text = card.querySelector('#ct').value.trim();
+    if (!file && text.length < 10) return toast('Add a photo, PDF or paste the text first', true);
+    e.target.disabled = true; card.querySelector('#cmsg').innerHTML = '<span class="spin"></span> Reading the invoice… this takes 10–30 seconds.';
+    try {
+      const ai = await api('/ai/invoice', { method: 'POST', body: file ? { file } : { text } });
+      const pre = await prepare(ai); pre.file = file;
+      form(pre);
+    } catch (err) { e.target.disabled = false; card.querySelector('#cmsg').textContent = err.message === 'login' ? '' : 'Could not read it: ' + (err.message || 'unknown error'); }
+  };
+}
+
+// Turn the AI's reading into purchase-form lines matched to Sian's inventory
+async function prepare(ai) {
+  const [mats, cats] = await Promise.all([api('/materials'), categories('material')]);
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  const lines = (ai.lines || []).map(l => {
+    let m = l.match && mats.find(x => norm(x.name) === norm(l.match));
+    if (!m) m = mats.find(x => norm(x.name) === norm(l.description));
+    let flag = '';
+    if (m) {
+      let q = convert(Number(l.quantity) || 0, l.unit, m.unit);
+      if (q == null) { q = Number(l.quantity) || 0; flag = `Check the quantity — invoice says ${l.quantity} ${l.unit}, “${m.name}” is counted in ${m.unit}.`; }
+      else if (l.unit !== m.unit && !((l.unit === 'kg' && m.unit === 'g') || (l.unit === 'l' && m.unit === 'ml') || (l.unit === 'g' && m.unit === 'kg') || (l.unit === 'ml' && m.unit === 'l'))) flag = `Converted ${l.quantity} ${l.unit} to ${m.unit} (1 g ≈ 1 ml) — please check.`;
+      return { material_id: m.id, qty: Math.round(q * 1000) / 1000, line_total: l.line_total, flag };
+    }
+    const cat = cats.find(c => c.active && norm(c.name) === norm(l.category));
+    return { new_material: { name: l.description, unit: ['g', 'kg', 'ml', 'l', 'each', 'pack'].includes(l.unit) ? l.unit : 'each', category_id: cat ? cat.id : '' }, qty: l.quantity, line_total: l.line_total, flag: 'New item — not in your inventory yet. Check the name and unit.' };
+  });
+  return { ...ai, lines };
 }

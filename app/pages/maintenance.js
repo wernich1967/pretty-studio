@@ -12,6 +12,7 @@ export function render() {
       <button class="btn danger" id="rmTest">Remove all test data</button></div>
       <div id="tmsg" class="note" style="margin-top:10px"></div></div>
   </div>
+  <div class="card"><h2>✨ AI usage</h2><div id="ai"><div class="empty">Loading…</div></div></div>
   <div class="card"><h2>What's stored</h2><div id="stats"><div class="empty">Loading…</div></div></div>`;
 }
 
@@ -23,7 +24,7 @@ async function stats() {
 }
 
 export async function after() {
-  stats();
+  stats(); aiUsage();
   $('#tfile').onchange = async e => {
     const file = e.target.files[0]; if (!file) return;
     const msg = t => $('#tmsg').innerHTML = t;
@@ -47,4 +48,12 @@ export async function after() {
       $('#tmsg').textContent = `✓ Test data removed (${r.filesRemoved} photos).`; toast('Test data removed'); stats();
     };
   };
+}
+
+async function aiUsage() {
+  const u = await api('/ai/usage'), usd = n => '$' + (Number(n) || 0).toFixed(n < 1 ? 4 : 2);
+  $('#ai').innerHTML = `${u.ready ? '' : '<div class="box aibox" style="margin-bottom:12px">AI is not switched on yet — the ANTHROPIC_API_KEY secret still needs to be added in Cloudflare.</div>'}
+    <div class="tiles"><div class="tile"><div class="k">Calls this month</div><div class="v">${u.month.calls}</div></div><div class="tile"><div class="k">Cost this month</div><div class="v">${usd(u.month.cost)}</div></div><div class="tile"><div class="k">Cost all time</div><div class="v">${usd(u.all.cost)}</div></div></div>
+    ${u.recent.length ? `<table class="tbl"><thead><tr><th>When</th><th>What</th><th class="r">Tokens</th><th class="r">Cost</th></tr></thead><tbody>${u.recent.map(r => `<tr><td>${esc(r.created_at)}</td><td>${esc(r.feature)}${r.ok ? '' : ' <span class="pill red" title="' + esc(r.error) + '">failed</span>'}<div class="note">${esc(r.user || '')}</div></td><td class="r">${(r.input_tokens + r.output_tokens).toLocaleString()}</td><td class="r">${usd(r.cost_usd)}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">No AI calls yet.</div>'}
+    <p class="note">Costs are in US dollars, billed by Anthropic to the API account.</p>`;
 }
