@@ -5,7 +5,8 @@ export const CHANGELOG = [
     'Lines the AI is unsure about are highlighted, and new items are suggested with a category.',
     'The captured invoice is attached to the purchase automatically.',
     'Maintenance shows AI usage — calls and cost per month.',
-    'Settings: choose the AI model — Sonnet (most accurate) or Haiku (cheapest).'
+    'Settings: choose the AI model — Sonnet (most accurate) or Haiku (cheapest).',
+    'Capture invoice: drag & drop a file, or press Ctrl+V to paste a screenshot. On a phone you can pick camera or gallery.'
   ]},
   { version: '0.6.0', date: '2026-10-04', items: [
     'Sales: record sales with several products, prices fill in from the product, stock goes down and profit is worked out per sale.',

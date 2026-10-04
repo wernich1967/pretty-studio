@@ -36,6 +36,7 @@ function renderNav() {
   $('#ver').textContent = `Version ${APP_VERSION} · ${new Date(APP_DATE).toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' })}`;
   $('#copy').textContent = `© ${new Date().getFullYear()} ${state.me?.business?.name || 'Pretty'} Studio. All rights reserved.`;
 }
+['dragover', 'drop'].forEach(ev => window.addEventListener(ev, e => { if (!e.target.closest?.('.drop')) e.preventDefault(); })); // a missed drop must not navigate away
 window.addEventListener('unhandledrejection', e => e.preventDefault()); // errors are already shown as a message
 $('#modal').addEventListener('click', e => { if (e.target.id === 'modal' || e.target.dataset.close !== undefined) $('#modal').hidden = true; });
 $('#ver').addEventListener('click', () => modal(`<h2>What's new</h2><div class="cl">${CHANGELOG.map(c => `<h3>Version ${c.version} <span class="note">· ${c.date}</span></h3><ul>${c.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>`).join('')}</div><div style="text-align:right;margin-top:18px"><button class="btn" data-close>Close</button></div>`));
