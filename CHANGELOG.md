@@ -1,6 +1,7 @@
 # Changelog
 
 ## v0.7.0 — 2026-10-04
+- Fix: newer models reject forced `tool_choice` ("tool"/"any") — now `auto` + instruction, with a text-JSON fallback.
 - ✨ AI invoice capture (`POST /api/ai/invoice`): photo/PDF/pasted text → Claude (default `claude-sonnet-5-5`, override with env `AI_MODEL`) via forced tool call `record_invoice`; lines matched to inventory, unit-converted, uncertain/new lines flagged; prefilled purchase form for review; captured file attached; optional delivery → Courier expense.
 - `lib/ai.js`: key only in Cloudflare secret `ANTHROPIC_API_KEY`; every call logged to `ai_usage` (app, feature, model, tokens, USD cost). `AI_MOCK` env for local testing.
 - Database v4: `ai_usage`. Maintenance shows AI usage.
