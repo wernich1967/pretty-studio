@@ -90,7 +90,7 @@ function renderNav() {
   $('#nav').innerHTML = all.filter(p => !p.foot).map(p => {
     const head = p.group && p.group !== last ? `<div class="ngroup">${p.group}</div>` : '';
     last = p.group || null;
-    return `${head}<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}">${p.label}${badge(p)}</a>`;
+    return `${head}<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}${p.group ? ' sub' : ''}">${p.label}${badge(p)}</a>`;
   }).join('');
   $('#ver').textContent = `Version ${APP_VERSION} · ${new Date(APP_DATE).toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' })}`;
   $('#copy').textContent = `© ${new Date().getFullYear()} ${state.me?.business?.name || 'Pretty'} Studio. All rights reserved.`;

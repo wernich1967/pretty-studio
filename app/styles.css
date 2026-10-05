@@ -225,3 +225,11 @@ nav a{white-space:nowrap;font-size:16px;padding:6px 10px}
  .bbar a,.bbar a.on{justify-content:center;border-radius:0;background:none;white-space:nowrap}
  .bbar a:hover{background:none}
 }
+/* Items inside a group sit indented under their heading */
+nav a.sub{margin-left:14px;padding-left:12px}
+.ngroup{padding-top:9px}
+.foot-nav{margin-bottom:8px}
+.side{gap:12px;padding-top:18px}
+.brand img{width:118px}
+nav a{padding-top:4px;padding-bottom:4px}
+.ngroup{padding-top:7px;padding-bottom:1px}

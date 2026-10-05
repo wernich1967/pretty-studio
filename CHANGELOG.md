@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.10.1 — 2026-10-05
+- Grouped menu items indented (`nav a.sub`); tighter sidebar spacing so the full menu fits at ~700px height.
+
 ## v0.10.0 — 2026-10-05
 - Menu grouped Buy / Make / Sell / Stock / Money / Tools (`PAGES[].group`); Settings, Maintenance, Help as footer links (`#footNav`); badges for setup progress, low stock (Ingredients & supplies) and curing (Batches).
 - ＋ New quick menu (`QUICK` in `app.js`): routes to the page and clicks its own button (`#addP`, `#aiBtn`, `#addB`, `#addS`, `#addE`, `#addR`, `#addItem`). Phone bottom bar (`#bbar`) replaces the ☰ button; quick menu opens as a bottom sheet.

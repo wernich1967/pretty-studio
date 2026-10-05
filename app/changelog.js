@@ -1,5 +1,6 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.10.1', date: '2026-10-05', items: ['Menu items now sit indented under their group, and the menu is a little more compact so it fits without scrolling.'] },
   { version: '0.10.0', date: '2026-10-05', items: [
     'A tidier menu, grouped the way you work: Buy → Make → Sell, then Stock, Money and Tools. Settings and Help moved to the bottom.',
     '＋ New button: record a purchase, capture an invoice, make a batch, record a sale or add an expense from any page.',
