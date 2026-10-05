@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.10.0 — 2026-10-05
+- Menu grouped Buy / Make / Sell / Stock / Money / Tools (`PAGES[].group`); Settings, Maintenance, Help as footer links (`#footNav`); badges for setup progress, low stock (Ingredients & supplies) and curing (Batches).
+- ＋ New quick menu (`QUICK` in `app.js`): routes to the page and clicks its own button (`#addP`, `#aiBtn`, `#addB`, `#addS`, `#addE`, `#addR`, `#addItem`). Phone bottom bar (`#bbar`) replaces the ☰ button; quick menu opens as a bottom sheet.
+- Curing merged into Batches (`curingCard` in `pages/curing.js`); `#/curing` redirects to `#/batches`.
+- Suppliers page (`pages/suppliers.js`); `GET /suppliers` adds `spent`; `DELETE /suppliers/:id` (archives if it has purchases).
+- Maintenance admin-only: `isAdmin()` in `lib/auth.js` (env `ADMIN_EMAILS`, comma-separated; default George's address); `/api/maintenance/*` returns 403 for others; `/me` returns `admin`.
+- Guided tour `app/tour.js` (`startTour(steps)`, spotlight + popover, "n of N", keyboard, phone-aware); started from Overview quick links and Getting started → Welcome.
+- Inventory renamed "Ingredients & supplies".
+
 ## v0.9.0 — 2026-10-05
 - Onboarding: `app/pages/setup.js` (“Getting started”) — 7-step wizard (welcome, business, categories, opening stock, first recipe, first batch, first sale). First visit with no progress and no hash redirects to `#/setup`; nav shows it under Overview with an `n/7` badge until finished/hidden, then next to Help. Overview progress card with Continue/Hide.
 - `lib/api/onboarding.js`: `GET /onboarding` (steps done — data steps computed from live counts), `PUT /onboarding` (`{step, done}` or `{hidden}`), progress stored in settings key `onboarding` (no migration).

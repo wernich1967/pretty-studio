@@ -67,7 +67,7 @@ const PANELS = {
       <p>Pretty Studio keeps track of everything you buy, make and sell — so you always know what's on the shelf, what each bottle costs you, and what you're really earning.</p>
       <div class="flow">
         <div><b>1 · Buy</b><span class="note">Record a supplier invoice in <i>Purchases</i> — ingredients go into stock. ✨ The AI can read the invoice for you.</span></div>
-        <div><b>2 · Make</b><span class="note">Pick a recipe in <i>Make a batch</i> — ingredients come out of stock, finished products go in, with a batch number and best-before date.</span></div>
+        <div><b>2 · Make</b><span class="note">Pick a recipe in <i>Batches</i> — ingredients come out of stock, finished products go in, with a batch number and best-before date.</span></div>
         <div><b>3 · Sell</b><span class="note">Record a sale — products leave stock and the studio works out your profit.</span></div>
       </div>
       <p class="note">This guide takes about 15 minutes. The first three steps set things up; the last three walk you through the real thing once.</p>
@@ -130,9 +130,9 @@ const PANELS = {
   batch(box) {
     box.innerHTML = `<h2>Make your first batch ${doneBadge('batch')}</h2>
       <p>Pick a recipe and how many times you're making it. The studio takes the ingredients out of stock, adds the finished products, gives the batch a number (like <b>B${today().slice(2).replace(/-/g, '')}-01</b>) and works out the cost per item.</p>
-      <ul class="note"><li>Soaps that need to cure go to <i>Curing</i> with a countdown.</li><li>Made a mistake? A batch can be undone as long as none of it has been sold.</li></ul>
+      <ul class="note"><li>Soaps that need to cure show at the top of <i>Batches</i> with a countdown.</li><li>Made a mistake? A batch can be undone as long as none of it has been sold.</li></ul>
       ${st.done.batch ? `<p>You've made <b>${st.counts.batches}</b> batch${st.counts.batches === 1 ? '' : 'es'}.</p>` : (st.done.recipe ? '<p class="note">This step ticks itself off once your first batch is saved.</p>' : '<p class="note">You\'ll need a recipe first.</p>')}
-      <div class="row" style="justify-content:flex-end"><a class="btn ${st.done.batch ? 'ghost' : ''}" href="#/batches">Go to Make a batch</a>${st.done.batch ? nextBtn('batch') : ''}</div>`;
+      <div class="row" style="justify-content:flex-end"><a class="btn ${st.done.batch ? 'ghost' : ''}" href="#/batches">Go to Batches</a>${st.done.batch ? nextBtn('batch') : ''}</div>`;
     wireNext(box);
   },
 

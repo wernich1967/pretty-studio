@@ -10,6 +10,7 @@
 <div class="shell">
   <aside class="side" id="side">
     <div class="brand"><img src="pretty-logo.png" alt="Pretty"><div class="tag">Studio</div></div>
+    <button class="btn newbtn" id="newBtn">＋ New</button>
     <nav id="nav"></nav>
     <div class="side-foot">
       <div class="foot-nav" id="footNav"></div>
@@ -22,6 +23,15 @@
     <div id="page"></div>
   </main>
 </div>
+<nav class="bbar" id="bbar" aria-label="Quick menu">
+  <a href="#/overview" data-p="overview"><span>⌂</span>Home</a>
+  <a href="#/inventory" data-p="inventory"><span>🫙</span>Stock</a>
+  <button id="bbNew" class="bbnew" aria-label="Add new">＋</button>
+  <a href="#/sales" data-p="sales"><span>🛍️</span>Sales</a>
+  <button id="bbMenu"><span>☰</span>Menu</button>
+</nav>
+<div id="quickShade" class="qshade" hidden></div>
+<div id="quick" class="quick" hidden></div>
 <div id="toast" class="toast" hidden></div>
 <div id="modal" class="modal" hidden><div class="modal-card" id="modalCard"></div></div>
 <script type="module" src="app.js"></script>

@@ -1,5 +1,15 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.10.0', date: '2026-10-05', items: [
+    'A tidier menu, grouped the way you work: Buy → Make → Sell, then Stock, Money and Tools. Settings and Help moved to the bottom.',
+    '＋ New button: record a purchase, capture an invoice, make a batch, record a sale or add an expense from any page.',
+    'On your phone: a bar at the bottom with Home, Stock, ＋ New, Sales and the menu.',
+    'Little counts in the menu show how many ingredients are running low and how many batches are curing.',
+    '“Make a batch” is now “Batches”, and anything curing shows at the top of that page.',
+    'New Suppliers page — contact details, how often you’ve bought and what you’ve spent with each.',
+    'Take the tour: a short guided walk-through of the studio (on the Overview page and in Getting started).',
+    '“Inventory” is now called “Ingredients & supplies”.'
+  ]},
   { version: '0.9.0', date: '2026-10-05', items: [
     'New “Getting started” guide: seven short steps to set up the studio — your details, categories, opening stock, then your first recipe, batch and sale.',
     'Import your stock spreadsheet: drop in an Excel or CSV file, check which column is which, preview, then import. New categories are added for you and items already in the studio are skipped.',

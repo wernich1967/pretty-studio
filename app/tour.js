@@ -4,14 +4,15 @@
 
 export const MAIN_TOUR = [
   { page: 'overview', target: '#tiles', title: 'Your day at a glance', text: 'Sales this month, low stock, batches curing and what your stock is worth — updated every time you buy, make or sell.' },
-  { target: '#nav a[href="#/inventory"]', title: 'Inventory', text: 'Ingredients, packaging and supplies. Items running low are marked in pink so you know what to reorder.' },
-  { target: '#nav a[href="#/products"]', title: 'Finished products', text: 'What you sell — stock on hand, what each one costs you to make, and your selling price.' },
-  { target: '#nav a[href="#/purchases"]', title: 'Purchases', text: 'Record what you buy and stock goes up by itself. ✨ Snap a photo of the invoice and the AI fills it in for you.' },
-  { target: '#nav a[href="#/recipes"]', title: 'Recipes', text: 'Your formulas, linked to your inventory, with the cost of a batch worked out from what you actually paid.' },
-  { target: '#nav a[href="#/batches"]', title: 'Make a batch', text: 'Choose a recipe — ingredients come out of stock, finished products go in, with a batch number and best-before date.' },
-  { target: '#nav a[href="#/sales"]', title: 'Sales', text: 'Record a sale — prices fill in, stock goes down and the profit on that sale is worked out.' },
-  { target: '#nav a[href="#/financial"]', title: 'Financial', text: 'Money in, money out and real profit — by month, with your best-selling products.' },
-  { target: '#ver', title: 'What’s new', text: 'Your studio gets updates. Click here any time to see what changed. You can take this tour again from the Overview page.' }
+  { target: '#newBtn', mobile: '#bbNew', title: '＋ New — your shortcut', text: 'Bought something, made a batch or sold something? Start here from any page — it opens the right form straight away.' },
+  { target: '#nav a[href="#/purchases"]', title: 'Buy', text: 'Record what you buy and the stock goes up by itself. ✨ Snap a photo of an invoice and the AI fills it in. Your suppliers are listed just below.' },
+  { target: '#nav a[href="#/recipes"]', title: 'Recipes', text: 'Your formulas, linked to your ingredients, with the cost of a batch worked out from what you actually paid.' },
+  { target: '#nav a[href="#/batches"]', title: 'Batches', text: 'Make a batch: ingredients come out of stock, finished products go in, with a batch number and best-before date. Anything still curing shows at the top.' },
+  { target: '#nav a[href="#/sales"]', title: 'Sell', text: 'Record a sale — prices fill in, stock goes down and the profit on that sale is worked out.' },
+  { target: '#nav a[href="#/inventory"]', title: 'Stock', text: 'Everything on your shelves: ingredients & supplies, and your finished products. The little pink number means something is running low.' },
+  { target: '#nav a[href="#/financial"]', title: 'Money', text: 'Money in, money out and your real profit by month — add courier, market fees and other costs here too.' },
+  { target: '#nav a[href="#/calculators"]', title: 'Tools', text: 'Handy calculators (percentages to grams, fragrance amounts, soap lye) and your saved how-to videos.' },
+  { target: '#footNav', title: 'Settings & help', text: 'Your business details and categories live in Settings. Click the version label below to see what’s new. You can take this tour again from the Overview page.' }
 ];
 
 let cur = null;
@@ -62,15 +63,16 @@ function move(d) {
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-async function find(sel) { for (let t = 0; t < 30; t++) { const x = document.querySelector(sel); if (x && x.offsetParent !== null || x?.closest('#side')) return x; await sleep(100); } return null; }
+async function find(sel) { for (let t = 0; t < 30; t++) { const x = document.querySelector(sel); if (x && x.offsetParent !== null || x?.closest('#side, #bbar')) return x; await sleep(100); } return null; }
 
 async function show() {
   const c = cur, s = c.steps[c.i];
   c.el.classList.add('moving');
   if (s.page && !location.hash.startsWith('#/' + s.page)) { location.hash = '#/' + s.page; await sleep(150); }
-  const inMenu = s.target.startsWith('#nav') || s.target === '#ver';
+  const phone = window.innerWidth <= 820, sel = (phone && s.mobile) || s.target;
+  const inMenu = !(phone && s.mobile) && (sel.startsWith('#nav') || ['#ver', '#newBtn', '#footNav'].includes(sel));
   document.querySelector('#side')?.classList.toggle('open', inMenu && window.innerWidth <= 820); // phone: slide the menu out
-  const t = await find(s.target);
+  const t = await find(sel);
   if (cur !== c) return;
   if (!t) return move(c.dir || 1); // not on screen — skip it
   c.target = t;

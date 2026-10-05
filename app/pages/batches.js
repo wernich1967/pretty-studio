@@ -1,12 +1,15 @@
 import { api, toast, modal, closeModal, esc, money, qty, today, options, convert, approx, $ } from '../core.js';
+import { curingCard } from './curing.js';
 
 export function render() {
-  return `<div class="head"><div><h1>Make a batch</h1><div class="sub">Making a batch takes the ingredients out of stock and adds the finished products to stock.</div></div><button class="btn" id="addB">+ Make a batch</button></div>
+  return `<div class="head"><div><h1>Batches</h1><div class="sub">Making a batch takes the ingredients out of stock and adds the finished products to stock. Batches that need time to cure show at the top.</div></div><button class="btn" id="addB">+ Make a batch</button></div>
+    <div id="curingBox"></div>
     <div class="card"><h2>Batch history</h2><div id="table"><div class="empty">Loading…</div></div></div>`;
 }
 export async function after() {
   const rows = await api('/batches');
   const t = today();
+  curingCard($('#curingBox'), rows, () => after());
   $('#table').innerHTML = rows.length ? `<table class="tbl"><thead><tr><th>Batch no.</th><th>Date</th><th>Recipe / product</th><th class="r">Made</th><th class="r">Cost</th><th>Best before</th></tr></thead><tbody>
     ${rows.map(b => `<tr data-id="${b.id}"><td><b>${esc(b.batch_no)}</b>${b.status === 'curing' && b.ready_date > t ? ' <span class="pill">curing until ' + esc(b.ready_date) + '</span>' : ''}</td><td>${esc(b.date)}</td><td>${esc(b.recipe || '—')}<div class="note">${esc(b.product || '')}</div></td>
       <td class="r">${b.qty_made || '—'}</td><td class="r">${money(b.cost_total)}</td><td>${b.best_before ? (b.best_before < t ? '<span class="pill red">' + esc(b.best_before) + '</span>' : esc(b.best_before)) : '—'}</td></tr>`).join('')}</tbody></table>`
