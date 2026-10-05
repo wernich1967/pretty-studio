@@ -12,10 +12,12 @@ import * as sales from './pages/sales.js';
 import * as financial from './pages/financial.js';
 import * as curing from './pages/curing.js';
 import * as calculators from './pages/calculators.js';
+import * as setup from './pages/setup.js';
 
 const APP_VERSION = CHANGELOG[0].version, APP_DATE = CHANGELOG[0].date;
 const PAGES = [
   { id: 'overview', label: 'Overview', mod: overview },
+  { id: 'setup', label: 'Getting started', mod: setup },
   { id: 'inventory', label: 'Inventory', mod: stock },
   { id: 'products', label: 'Finished products', mod: stock },
   { id: 'purchases', label: 'Purchases', mod: purchases },
@@ -31,8 +33,15 @@ const PAGES = [
   { id: 'help', label: 'Help', soon: true }
 ];
 
+// While setup is in progress "Getting started" sits under Overview with a progress badge; afterwards it moves down next to Help.
+function navPages() {
+  const o = state.onb, active = o && !o.hidden && !o.complete, list = PAGES.filter(p => p.id !== 'setup'), s = PAGES.find(p => p.id === 'setup');
+  list.splice(active ? 1 : list.length - 1, 0, s);
+  return list;
+}
 function renderNav() {
-  $('#nav').innerHTML = PAGES.map(p => `<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}">${p.label}${p.soon ? '<span class="soon">soon</span>' : ''}</a>`).join('');
+  const o = state.onb, badge = o && !o.hidden && !o.complete ? `<span class="soon">${o.doneCount}/${o.total}</span>` : '';
+  $('#nav').innerHTML = navPages().map(p => `<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}">${p.label}${p.soon ? '<span class="soon">soon</span>' : ''}${p.id === 'setup' ? badge : ''}</a>`).join('');
   $('#ver').textContent = `Version ${APP_VERSION} · ${new Date(APP_DATE).toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' })}`;
   $('#copy').textContent = `© ${new Date().getFullYear()} ${state.me?.business?.name || 'Pretty'} Studio. All rights reserved.`;
 }
@@ -51,11 +60,13 @@ async function route() {
   state.page = p.id; renderNav(); $('#side').classList.remove('open'); $('#modal').hidden = true;
   $('#page').innerHTML = p.soon ? soon(p) : p.mod.render(p.id);
   window.scrollTo(0, 0);
-  if (p.mod?.after) { try { await p.mod.after(p.id === 'settings' ? { renderNav } : p.id); } catch (e) { console.error(e); } }
+  if (p.mod?.after) { try { await p.mod.after(['settings', 'setup'].includes(p.id) ? { renderNav } : p.id); } catch (e) { console.error(e); } }
 }
 
 (async function start() {
   try { state.me = await api('/me'); } catch { state.me = { business: {} }; }
+  try { state.onb = await api('/onboarding'); } catch { state.onb = null; }
+  if (state.onb && !state.onb.started && !state.onb.hidden && !location.hash) location.hash = '#/setup'; // very first visit → setup guide
   window.addEventListener('hashchange', route);
   route();
 })();

@@ -123,3 +123,42 @@ details summary{cursor:pointer}
 .page .pname{font-size:11px;color:var(--muted);padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pdel{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(47,61,66,.75);color:#fff;cursor:pointer;font-size:12px;line-height:24px;padding:0}
 .pdel:hover{background:var(--rose)}
+
+/* Getting started (setup wizard) */
+.wiz{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;align-items:start}
+.wsteps{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;position:sticky;top:18px}
+.wprog{padding:4px 6px 10px}
+.wstep{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;border-radius:10px;padding:9px 8px;cursor:pointer;font:inherit;color:var(--text)}
+.wstep:hover{background:var(--teal-l)}
+.wstep.on{background:var(--teal-l);box-shadow:inset 3px 0 0 var(--teal)}
+.wstep b{display:block;font:500 17px "Cormorant Garamond",serif}
+.wstep .note{font-size:12px}
+.wstep .dot{flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line2);display:flex;align-items:center;justify-content:center;font:600 12px "Source Sans 3";color:var(--muted);margin-top:2px}
+.wstep.done .dot{background:var(--teal);border-color:var(--teal);color:#fff}
+.linkbtn{background:none;border:0;color:var(--muted);font:600 12px "Source Sans 3";cursor:pointer;margin:10px 8px 2px;padding:0;text-decoration:underline}
+.wpanel h2 .pill{font-size:10px;margin-left:6px}
+.wpanel h3{font-size:19px;margin:4px 0 8px}
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.flow>div{background:var(--teal-l);border-radius:12px;padding:14px}
+.flow b{display:block;font:500 20px "Cormorant Garamond",serif;color:var(--teal-d);margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--teal-l);color:var(--teal-d);border-radius:999px;padding:5px 6px 5px 12px;font-weight:600;font-size:13.5px}
+.chip button{background:none;border:0;color:var(--muted);cursor:pointer;width:22px;height:22px;border-radius:50%;font-size:11px;padding:0}
+.chip button:hover{background:#fff;color:var(--rose)}
+.chipadd{display:inline-flex;gap:6px}.chipadd input{width:140px;padding:6px 10px;border-radius:999px}
+.wopts .box{margin:0}
+.wopts{margin:14px 0 16px}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:999px;overflow:hidden}
+.seg button{background:#fff;border:0;padding:8px 16px;font:600 13.5px "Source Sans 3";color:var(--teal-d);cursor:pointer}
+.seg button.on{background:var(--teal);color:#fff}
+.mapg{gap:4px 18px}
+.tscroll{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.tscroll .tbl th{position:sticky;top:0;background:#fff}
+.tbl tr.skip td{color:var(--faint)}
+.warnt{color:#9a6a1c}
+.wdone{background:#e9f5ef;border:1px solid #bfe0cc}
+.onbcard{background:linear-gradient(120deg,#fff 55%,var(--blush-l))}
+.onbcard .prog{max-width:360px}
+@media (max-width:820px){.wiz{grid-template-columns:1fr}.wsteps{position:static}.flow{grid-template-columns:1fr}}
+.wpanel a:not(.btn){color:var(--teal-d)}
+@media (max-width:820px){.wstep .note{display:none}.wstep{padding:6px 8px}}

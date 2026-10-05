@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.0 — 2026-10-05
+- Onboarding: `app/pages/setup.js` (“Getting started”) — 7-step wizard (welcome, business, categories, opening stock, first recipe, first batch, first sale). First visit with no progress and no hash redirects to `#/setup`; nav shows it under Overview with an `n/7` badge until finished/hidden, then next to Help. Overview progress card with Continue/Hide.
+- `lib/api/onboarding.js`: `GET /onboarding` (steps done — data steps computed from live counts), `PUT /onboarding` (`{step, done}` or `{hidden}`), progress stored in settings key `onboarding` (no migration).
+- Opening-stock spreadsheet import: `POST /onboarding/import` `{kind, rows, dry_run, date}` — numbers cleaned (`R 1 234,50`), unit words normalised (grams/kgs/pcs/litre…), product size parsed (`250ml`), new categories created, existing names and in-sheet repeats skipped, opening movements dated to the count date. Browser reads .xlsx/.csv with SheetJS (cdnjs, loaded on demand), auto-detects the header row and maps columns; CSV templates for materials and products.
+
 ## v0.8.0 — 2026-10-04
 - Multi-page capture: up to 8 pages (drop/choose/paste repeatedly), thumbnails with ✕ remove; AI endpoints accept `files: []` (legacy `file` still works) and are told the pages are one document; purchases store every page (`invoice-<id>`, `invoice-<id>-pN`) and list them; delete removes all pages.
 - ✨ AI recipe capture (`POST /api/ai/recipe`, tool `record_recipe`): ingredients matched to inventory, %→grams conversion flagged, method/notes/uncertain, captured photo becomes the recipe image. Logged as feature `recipe-capture`.

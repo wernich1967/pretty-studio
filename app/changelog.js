@@ -1,5 +1,11 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.9.0', date: '2026-10-05', items: [
+    'New “Getting started” guide: seven short steps to set up the studio — your details, categories, opening stock, then your first recipe, batch and sale.',
+    'Import your stock spreadsheet: drop in an Excel or CSV file, check which column is which, preview, then import. New categories are added for you and items already in the studio are skipped.',
+    'No spreadsheet? Download a ready-made template, fill it in and drop it back in.',
+    'Overview shows how far setup is — continue or hide it any time. The guide stays in the menu under “Getting started”.'
+  ]},
   { version: '0.8.0', date: '2026-10-04', items: [
     '✨ Capture recipe: drop a photo of a recipe card, a PDF, or paste a recipe — the AI fills in ingredients (linked to your inventory), amounts, method and notes for you to check.',
     'Recipes in percentages are converted to grams for the batch size.',
