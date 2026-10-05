@@ -2,7 +2,7 @@
 import { api, toast, modal, closeModal, esc, money, qty, today, UNITS, REASONS, options, categories, $ } from '../core.js';
 
 const CFG = {
-  inventory: { table: 'materials', kind: 'material', title: 'Inventory', sub: 'Ingredients, packaging and supplies — stock updates from purchases, batches and adjustments.', noun: 'item' },
+  inventory: { table: 'materials', kind: 'material', title: 'Ingredients & supplies', sub: 'Ingredients, packaging and supplies — stock updates from purchases, batches and adjustments.', noun: 'item' },
   products: { table: 'products', kind: 'product', title: 'Finished products', sub: 'What you sell — stock on hand, cost and selling price.', noun: 'product' }
 };
 const view = { q: '', cat: '' };

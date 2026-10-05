@@ -162,3 +162,22 @@ details summary{cursor:pointer}
 @media (max-width:820px){.wiz{grid-template-columns:1fr}.wsteps{position:static}.flow{grid-template-columns:1fr}}
 .wpanel a:not(.btn){color:var(--teal-d)}
 @media (max-width:820px){.wstep .note{display:none}.wstep{padding:6px 8px}}
+
+/* Grouped menu */
+.side{gap:18px;padding-top:22px}
+.brand img{width:130px}
+nav{gap:1px;margin:0 -6px;padding:0 6px}
+nav a{padding:6px 12px;font-size:16.5px;border-radius:9px}
+.ngroup{font:600 10px "Source Sans 3";letter-spacing:.16em;text-transform:uppercase;color:var(--blush);padding:12px 12px 3px}
+.nb{font:600 10px "Source Sans 3";background:var(--teal-l);color:var(--teal-d);border-radius:999px;padding:1px 7px;letter-spacing:.02em}
+.nb.warn{background:var(--blush-l);color:var(--rose)}
+nav a.on .nb{background:rgba(255,255,255,.2);color:#fff}
+nav a{gap:8px}nav a .nb{flex:none}
+.foot-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 6px;margin-bottom:12px;font:600 12.5px "Source Sans 3";color:var(--faint)}
+.foot-nav a{color:var(--muted);text-decoration:none;padding:2px 6px;border-radius:6px}
+.foot-nav a:hover{background:var(--teal-l);color:var(--teal-d)}
+.foot-nav a.on{background:var(--teal);color:#fff}
+.side{padding-left:14px;padding-right:14px}
+nav a{white-space:nowrap;font-size:16px;padding:6px 10px}
+.ngroup{padding-left:10px}
+.foot-nav{font-size:12px;gap:2px 2px}.foot-nav a{padding:2px 4px}

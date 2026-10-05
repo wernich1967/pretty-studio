@@ -108,7 +108,7 @@ const PANELS = {
       ${st.done.stock ? `<div class="box">You have <b>${st.counts.materials}</b> inventory item${st.counts.materials === 1 ? '' : 's'} and <b>${st.counts.products}</b> finished product${st.counts.products === 1 ? '' : 's'}. Import another sheet below, or carry on.</div>` : ''}
       <div class="grid2 wopts">
         <div class="box"><b>Import your spreadsheet</b><div class="note">Excel or CSV — the quickest way if you already keep a stock list.</div></div>
-        <div class="box"><b>Or add items one by one</b><div class="note">Add each item with its opening stock in <a href="#/inventory">Inventory</a> (ingredients & supplies) or <a href="#/products">Finished products</a>.</div></div>
+        <div class="box"><b>Or add items one by one</b><div class="note">Add each item with its opening stock in <a href="#/inventory">Ingredients & supplies</a> (ingredients & supplies) or <a href="#/products">Finished products</a>.</div></div>
       </div>
       <div id="imp"></div>
       <div class="row" style="justify-content:flex-end;margin-top:6px">${st.done.stock ? nextBtn('stock') : '<button class="btn ghost" data-next="recipe">Skip for now</button>'}</div>`;
