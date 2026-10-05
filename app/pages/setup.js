@@ -1,5 +1,6 @@
 // Getting started — the setup wizard shown on first login (and any time from the menu).
 import { api, toast, esc, state, money, qty, today, $ } from '../core.js';
+import { startTour, MAIN_TOUR } from '../tour.js';
 
 const STEPS = [
   { id: 'welcome', title: 'Welcome', sub: 'How the studio works' },
@@ -70,8 +71,9 @@ const PANELS = {
         <div><b>3 · Sell</b><span class="note">Record a sale — products leave stock and the studio works out your profit.</span></div>
       </div>
       <p class="note">This guide takes about 15 minutes. The first three steps set things up; the last three walk you through the real thing once.</p>
-      <div class="row" style="justify-content:flex-end"><button class="btn" id="wGo">${st.done.welcome ? 'Next →' : 'Let\'s start →'}</button></div>`;
+      <div class="row" style="justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" id="wTour">Show me around (1 min)</button><button class="btn" id="wGo">${st.done.welcome ? 'Next →' : 'Let\'s start →'}</button></div>`;
     box.querySelector('#wGo').onclick = async () => { await mark('welcome'); go(nextOf('welcome')); };
+    box.querySelector('#wTour').onclick = () => startTour(MAIN_TOUR, () => { location.hash = '#/setup'; });
   },
 
   business(box) {

@@ -1,4 +1,5 @@
 import { api, esc, state, money, qty, REASONS, toast, $ } from '../core.js';
+import { startTour, MAIN_TOUR } from '../tour.js';
 const QUOTES = ['One good batch at a time — that is how a business grows.', 'Keep notes: your future self is your best apprentice.',
   'Measure twice, pour once, smile always.', 'Your craft is proof that gentle things can be strong.', 'Pretty is not doing less — it is doing it with attention.'];
 
@@ -12,14 +13,16 @@ export function render() {
     <div class="tiles" id="tiles"><div class="tile"><div class="k">Loading</div><div class="v">…</div></div></div>
     <div class="grid2"><div class="card"><h2>Recent stock changes</h2><div id="recent"></div></div>
     <div class="card"><h2>Quick links</h2><div class="list">
+      <a class="li qlink" href="#" id="takeTour"><span class="name">✨ Take the tour — what's where</span>›</a>
       <a class="li qlink" href="#/inventory"><span class="name">Ingredients & supplies</span>›</a>
       <a class="li qlink" href="#/products"><span class="name">Finished products</span>›</a>
       <a class="li qlink" href="#/sales"><span class="name">Record a sale</span>›</a>
       <a class="li qlink" href="#/financial"><span class="name">Financial — money in, money out, profit</span>›</a>
       <a class="li qlink" href="#/settings"><span class="name">Settings — categories & business details</span>›</a>
-      <a class="li qlink" href="#/maintenance"><span class="name">Maintenance — backup & test data</span>›</a></div></div></div>`;
+      <a class="li qlink" href="#/suppliers"><span class="name">Suppliers</span>›</a></div></div></div>`;
 }
 export async function after() {
+  $('#takeTour').onclick = e => { e.preventDefault(); startTour(MAIN_TOUR); };
   onboardingCard();
   const d = await api('/dashboard');
   $('#tiles').innerHTML = [['Sales this month', money(d.salesMonth)], ["Ingredients & supplies", d.materials], ['Finished products', d.products], ['Low stock', d.lowStock], ['Curing', d.curing], ['Stock value', money(d.stockValue)]]

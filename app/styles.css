@@ -181,3 +181,19 @@ nav a{gap:8px}nav a .nb{flex:none}
 nav a{white-space:nowrap;font-size:16px;padding:6px 10px}
 .ngroup{padding-left:10px}
 .foot-nav{font-size:12px;gap:2px 2px}.foot-nav a{padding:2px 4px}
+/* Guided tour */
+.tour{position:fixed;inset:0;z-index:90}
+.tour-block{position:fixed;inset:0;cursor:pointer}
+.tour-spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(47,61,66,.55),0 0 0 3px var(--blush);pointer-events:none;transition:all .25s ease}
+.tour-pop{position:fixed;width:320px;max-width:calc(100vw - 16px);background:#fff;border-radius:16px;padding:16px 18px 14px;box-shadow:0 14px 40px rgba(47,61,66,.3);transition:left .25s ease,top .25s ease,opacity .15s}
+.tour.moving .tour-pop{opacity:0}
+.tour-count{display:flex;justify-content:space-between;align-items:center;font:600 11px "Source Sans 3";letter-spacing:.08em;text-transform:uppercase;color:var(--blush)}
+.tour-dots{display:flex;gap:4px}.tour-dots i{width:6px;height:6px;border-radius:50%;background:var(--line2)}.tour-dots i.on{background:var(--teal);width:14px;border-radius:3px}
+.tour-title{font-size:22px;margin:6px 0 4px}
+.tour-text{margin:0 0 14px;color:var(--muted);font-size:14.5px}
+.tour-foot{display:flex;gap:8px;align-items:center}.tour-foot .linkbtn{margin:0}
+.tour-pop::before{content:"";position:absolute;width:12px;height:12px;background:#fff;transform:rotate(45deg)}
+.tour-pop[data-side=right]::before{left:-6px;top:calc(50% - 6px)}
+.tour-pop[data-side=below]::before{top:-6px;left:calc(50% - 6px)}
+.tour-pop[data-side=above]::before{bottom:-6px;left:calc(50% - 6px)}
+.tour-pop[data-side=free]::before{display:none}
