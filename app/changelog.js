@@ -1,5 +1,12 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.11.0', date: '2026-10-07', items: [
+    'Choose your studio colours: Sage & kraft (new), Sea glass or Rose clay. Pick them in Getting started or in Settings — every device that signs in follows.',
+    'A fresh look: small icons in the menu, a softer highlight for the page you are on, and Settings, Maintenance, Guide and Help as a neat row of icons at the bottom.',
+    'Each page shows its menu group above the title, with a little leaf sprig in the corner.',
+    'Maintenance is tidier: AI costs in rand, dates in plain words, names instead of email addresses, and a quick count of what is stored.',
+    'Invoice capture now includes VAT in each line’s cost (you are not VAT-registered, so VAT is part of what things cost). If the lines don’t add up to the invoice total, you get a warning before saving.'
+  ]},
   { version: '0.10.1', date: '2026-10-05', items: ['Menu items now sit indented under their group, and the menu is a little more compact so it fits without scrolling.'] },
   { version: '0.10.0', date: '2026-10-05', items: [
     'A tidier menu, grouped the way you work: Buy → Make → Sell, then Stock, Money and Tools. Settings and Help moved to the bottom.',

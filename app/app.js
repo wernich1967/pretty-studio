@@ -1,5 +1,5 @@
 import { CHANGELOG } from './changelog.js';
-import { state, $, esc, api, modal } from './core.js';
+import { state, $, esc, api, modal, icon, setSkin } from './core.js';
 import * as overview from './pages/overview.js';
 import * as stock from './pages/stock.js';
 import * as settings from './pages/settings.js';
@@ -31,8 +31,8 @@ const PAGES = [
   { id: 'financial', label: 'Financial', group: 'Money', mod: financial },
   { id: 'calculators', label: 'Calculators', group: 'Tools', mod: calculators },
   { id: 'videos', label: 'Videos', group: 'Tools', mod: videos },
-  { id: 'settings', label: 'Settings', foot: true, mod: settings },
-  { id: 'maintenance', label: 'Maintenance', foot: true, admin: true, mod: maintenance },
+  { id: 'settings', label: 'Settings', foot: true, eyebrow: 'Studio', mod: settings },
+  { id: 'maintenance', label: 'Maintenance', foot: true, admin: true, eyebrow: 'Admin only', mod: maintenance },
   { id: 'help', label: 'Help', foot: true, soon: true }
 ];
 
@@ -86,11 +86,11 @@ function renderNav() {
   let last = null;
   const all = navPages();
   // Settings, Maintenance, Help (and the guide once finished) sit as small links at the bottom so the menu fits without scrolling.
-  $('#footNav').innerHTML = all.filter(p => p.foot).map(p => `<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}">${p.label}</a>`).join('<span>·</span>');
+  $('#footNav').innerHTML = all.filter(p => p.foot).map(p => `<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}" title="${p.label}" aria-label="${p.label}">${icon(p.id)}</a>`).join('');
   $('#nav').innerHTML = all.filter(p => !p.foot).map(p => {
     const head = p.group && p.group !== last ? `<div class="ngroup">${p.group}</div>` : '';
     last = p.group || null;
-    return `${head}<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}${p.group ? ' sub' : ''}">${p.label}${badge(p)}</a>`;
+    return `${head}<a href="#/${p.id}" class="${p.id === state.page ? 'on' : ''}${p.group ? ' sub' : ''}">${icon(p.id)}<span>${p.label}</span>${badge(p)}</a>`;
   }).join('');
   $('#ver').textContent = `Version ${APP_VERSION} · ${new Date(APP_DATE).toLocaleDateString('en-ZA', { day: '2-digit', month: 'short', year: 'numeric' })}`;
   $('#copy').textContent = `© ${new Date().getFullYear()} ${state.me?.business?.name || 'Pretty'} Studio. All rights reserved.`;
@@ -121,13 +121,17 @@ async function route() {
   state.page = p.id; renderNav(); refreshCounts();
   document.querySelectorAll('#bbar [data-p]').forEach(a => a.classList.toggle('on', a.dataset.p === p.id)); $('#side').classList.remove('open'); $('#modal').hidden = true;
   $('#page').innerHTML = p.soon ? soon(p) : p.mod.render(p.id);
+  const h1 = $('#page .head h1'), eb = p.eyebrow || p.group; // small label above the title: the menu group the page belongs to
+  if (h1 && eb) h1.insertAdjacentHTML('beforebegin', `<span class="eyebrow">${esc(eb)}</span>`);
   window.scrollTo(0, 0);
   if (p.mod?.after) { try { await p.mod.after(['settings', 'setup'].includes(p.id) ? { renderNav } : p.id); } catch (e) { console.error(e); } }
   clickPending();
 }
 
 (async function start() {
+  document.querySelectorAll('#bbar [data-i]').forEach(s => s.innerHTML = icon(s.dataset.i));
   try { state.me = await api('/me'); } catch { state.me = { business: {} }; }
+  if (state.me.business?.theme) setSkin(state.me.business.theme);
   try { state.onb = await api('/onboarding'); } catch { state.onb = null; }
   if (state.onb && !state.onb.started && !state.onb.hidden && !location.hash) location.hash = '#/setup'; // very first visit → setup guide
   window.addEventListener('hashchange', route);

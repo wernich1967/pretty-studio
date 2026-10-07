@@ -1,5 +1,5 @@
 // Getting started — the setup wizard shown on first login (and any time from the menu).
-import { api, toast, esc, state, money, qty, today, $ } from '../core.js';
+import { api, toast, esc, state, money, qty, today, $, themePicker } from '../core.js';
 import { startTour, MAIN_TOUR } from '../tour.js';
 
 const STEPS = [
@@ -86,7 +86,9 @@ const PANELS = {
         <div class="field"><label>Email</label><input id="bEmail" type="email" value="${esc(b.email)}"></div>
       </div>
       <div class="field"><label>Address</label><textarea id="bAddr" rows="2">${esc(b.address)}</textarea></div>
+      <div class="field"><label>Studio colours</label><div id="bSkin"></div><p class="note" style="margin:6px 0 0">Pick the look you like — it changes straight away. You can switch any time in Settings.</p></div>
       <div class="row" style="justify-content:flex-end"><button class="btn" id="bSave">Save and continue →</button></div>`;
+    themePicker(box.querySelector('#bSkin'));
     box.querySelector('#bSave').onclick = async () => {
       if (!$('#bOwner').value.trim()) { toast('Please add your name', true); $('#bOwner').focus(); return; }
       state.me.business = await api('/settings/business', { method: 'PUT', body: { name: $('#bName').value, ownerName: $('#bOwner').value, phone: $('#bPhone').value, email: $('#bEmail').value, address: $('#bAddr').value } });

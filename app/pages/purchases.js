@@ -1,6 +1,15 @@
 import { captureModal } from '../capture.js';
 import { api, toast, modal, closeModal, esc, money, qty, today, UNITS, options, categories, readFile, convert, $ } from '../core.js';
 
+// AI check: lines + delivery should add up to what was paid. A gap of about 15% usually means the lines were read without VAT.
+function vatGap(pre) {
+  if (!pre.total) return '';
+  const sum = (pre.lines || []).reduce((a, l) => a + (Number(l.line_total) || 0), 0) + (Number(pre.delivery_fee) || 0), gap = pre.total - sum;
+  if (Math.abs(gap) <= 1) return '';
+  const vat = Math.abs(sum * 1.15 - pre.total) <= Math.max(1, pre.total * 0.01);
+  return `<div class="note warnt" style="margin-top:4px">⚠ The lines add up to ${money(sum)}, not ${money(pre.total)}.${vat ? ' It looks like VAT was left out — add the VAT to the line totals, because VAT is part of what each item cost you.' : ' Check the line totals before saving.'}</div>`;
+}
+
 export function render() {
   return `<div class="head"><div><h1>Purchases</h1><div class="sub">Everything that comes into the studio. Saving a purchase adds the stock to Inventory.</div></div>
     <div class="row"><button class="btn ghost" id="aiBtn">✨ Capture invoice (AI)</button><button class="btn" id="addP">+ Record a purchase</button></div></div>
@@ -32,7 +41,7 @@ async function form(pre = null) {
   const [mats, sups, cats] = await Promise.all([api('/materials'), api('/suppliers'), categories('material')]);
   const matOpts = `<option value="">— choose item —</option>${mats.map(m => `<option value="${m.id}" data-unit="${esc(m.unit)}">${esc(m.name)} (${esc(m.unit)})</option>`).join('')}<option value="__new">+ New item…</option>`;
   const card = modal(`<h2>${pre ? '✨ Check the AI\'s reading' : 'Record a purchase'}</h2>
-    ${pre ? `<div class="box aibox"><b>Filled in by AI — please check every line before saving.</b>${pre.notes ? `<div class="note" style="margin-top:4px">AI note: ${esc(pre.notes)}</div>` : ''}${pre.total ? `<div class="note">Invoice total: ${money(pre.total)}${pre.delivery_fee ? ' (incl. delivery ' + money(pre.delivery_fee) + ')' : ''}</div>` : ''}
+    ${pre ? `<div class="box aibox"><b>Filled in by AI — please check every line before saving.</b>${pre.notes ? `<div class="note" style="margin-top:4px">AI note: ${esc(pre.notes)}</div>` : ''}${pre.total ? `<div class="note">Invoice total: ${money(pre.total)}${pre.delivery_fee ? ' (incl. delivery ' + money(pre.delivery_fee) + ')' : ''}</div>` : ''}${vatGap(pre)}
       ${pre.delivery_fee > 0 ? `<label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-size:14px;color:var(--text);margin:8px 0 0"><input type="checkbox" id="delv" checked style="width:auto"> Record the ${money(pre.delivery_fee)} delivery as an expense (Courier)</label>` : ''}</div>` : ''}
     <div class="grid2">
       <div class="field"><label>Supplier</label><input id="sup" list="supList" placeholder="Type or pick a supplier"><datalist id="supList">${sups.map(s => `<option value="${esc(s.name)}">`).join('')}</datalist></div>

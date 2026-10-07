@@ -1,4 +1,4 @@
-import { api, toast, esc, state, $, clearCatCache } from '../core.js';
+import { api, toast, esc, state, $, clearCatCache, themePicker, icon } from '../core.js';
 
 export function render() {
   return `<div class="head"><div><h1>Settings</h1><div class="sub">Your business details and the categories used across the studio.</div></div></div>
@@ -12,6 +12,7 @@ export function render() {
     <div class="field"><label>Address</label><textarea id="bAddr" rows="2"></textarea></div>
     <div style="text-align:right"><button class="btn" id="bSave">Save details</button></div>
   </div>
+  <div class="card"><div class="chead"><span class="cic">${icon('palette')}</span><div><h2>Studio colours</h2><div class="note">Changes the look on every device that signs in.</div></div></div><div id="skinSet"></div></div>
   <div class="grid2">
     <div class="card"><h2>Product categories</h2><p class="note" style="margin-top:-6px">What you sell — e.g. Hair Oil, Shampoo, Perfume.</p><div id="cat-product"></div></div>
     <div class="card"><h2>Material categories</h2><p class="note" style="margin-top:-6px">What you buy — ingredients, packaging, labels…</p><div id="cat-material"></div></div>
@@ -27,6 +28,7 @@ export async function after(ctx) {
     state.me.business = await api('/settings/business', { method: 'PUT', body: { name: $('#bName').value, ownerName: $('#bOwner').value, phone: $('#bPhone').value, email: $('#bEmail').value, address: $('#bAddr').value } });
     ctx.renderNav(); toast('Details saved');
   };
+  themePicker($('#skinSet'));
   aiSettings();
   await Promise.all(['product', 'material'].map(renderCats));
 }

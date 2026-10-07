@@ -1,15 +1,16 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="en" data-skin="sage"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pretty Studio</title>
 <link rel="icon" href="pretty-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script>try{var k=localStorage.getItem('ps-skin');if(k)document.documentElement.dataset.skin=k}catch(e){}</script>
 </head><body>
 <div class="shell">
   <aside class="side" id="side">
-    <div class="brand"><img src="pretty-logo.png" alt="Pretty"><div class="tag">Studio</div></div>
+    <div class="brand"><div class="wm">PRETTY<span>.</span></div><div class="tag">Studio</div></div>
     <button class="btn newbtn" id="newBtn">＋ New</button>
     <nav id="nav"></nav>
     <div class="side-foot">
@@ -19,16 +20,17 @@
     </div>
   </aside>
   <main class="main">
+    <svg class="sprig" viewBox="0 0 260 300" aria-hidden="true"><path d="M230 10C180 90 150 170 70 290" fill="none" stroke="currentColor" stroke-width="2"/><g fill="currentColor"><ellipse cx="205" cy="55" rx="34" ry="12" transform="rotate(-35 205 55)"/><ellipse cx="170" cy="70" rx="30" ry="11" transform="rotate(40 170 70)"/><ellipse cx="185" cy="115" rx="36" ry="12" transform="rotate(-30 185 115)"/><ellipse cx="140" cy="130" rx="32" ry="11" transform="rotate(45 140 130)"/><ellipse cx="155" cy="178" rx="34" ry="12" transform="rotate(-25 155 178)"/><ellipse cx="108" cy="192" rx="30" ry="10" transform="rotate(50 108 192)"/><ellipse cx="120" cy="238" rx="30" ry="10" transform="rotate(-20 120 238)"/></g></svg>
     <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
     <div id="page"></div>
   </main>
 </div>
 <nav class="bbar" id="bbar" aria-label="Quick menu">
-  <a href="#/overview" data-p="overview"><span>⌂</span>Home</a>
-  <a href="#/inventory" data-p="inventory"><span>🫙</span>Stock</a>
+  <a href="#/overview" data-p="overview"><span data-i="overview"></span>Home</a>
+  <a href="#/inventory" data-p="inventory"><span data-i="inventory"></span>Stock</a>
   <button id="bbNew" class="bbnew" aria-label="Add new">＋</button>
-  <a href="#/sales" data-p="sales"><span>🛍️</span>Sales</a>
-  <button id="bbMenu"><span>☰</span>Menu</button>
+  <a href="#/sales" data-p="sales"><span data-i="sales"></span>Sales</a>
+  <button id="bbMenu"><span data-i="menu"></span>Menu</button>
 </nav>
 <div id="quickShade" class="qshade" hidden></div>
 <div id="quick" class="quick" hidden></div>

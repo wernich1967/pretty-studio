@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.11.0 — 2026-10-07
+- Colour themes: `:root[data-skin=sage|sea|rose]` in `styles.css` redefine the existing tokens (`--teal*` = main, `--blush*` = accent, `--rose` = warning); sage is the default. `THEMES`, `setSkin`, `themePicker` in `core.js`; picker on Getting started → Your business and in Settings. Saved via `PUT /settings/theme` into the `business` setting (`theme`) and cached in localStorage (`ps-skin`) so the page paints in the right colours before `/me` returns. Hard-coded teal tints and `#fff` card backgrounds replaced with tokens.
+- Look: text wordmark replaces the logo image in the sidebar; outline icons (`icon()` in `core.js`) in the menu, footer row (now icons with tooltips) and phone bar; active menu item is a tint; page eyebrow (menu group, or `eyebrow` on the page entry) inserted by `route()`; underline under page titles; leaf sprig behind the page header.
+- Maintenance: card headers with icons, test-record tag, AI usage in rand (`ZAR_PER_USD` = 18.2) with dollars as small print, local dates, feature names in words, user shown by name; "What's stored" as count tiles with the full table under "All tables".
+- Invoice capture: prompt and `line_total` description now require VAT-inclusive line totals (business not VAT-registered); the review form warns when lines + delivery don't match the invoice total and says when the gap looks like 15% VAT (`vatGap` in `pages/purchases.js`).
+
 ## v0.10.1 — 2026-10-05
 - Grouped menu items indented (`nav a.sub`); tighter sidebar spacing so the full menu fits at ~700px height.
 
