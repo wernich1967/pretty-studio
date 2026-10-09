@@ -1,5 +1,6 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  {version:'0.11.1',date:'2026-10-09',items:['Connect Pretty Studio to EU Digital’s private AI Usage tracker from Maintenance. Monthly calls, tokens and estimated USD cost sync automatically after each AI call.']},
   { version: '0.11.0', date: '2026-10-07', items: [
     'Choose your studio colours: Sage & kraft (new), Sea glass or Rose clay. Pick them in Getting started or in Settings — every device that signs in follows.',
     'A fresh look: small icons in the menu, a softer highlight for the page you are on, and Settings, Maintenance, Guide and Help as a neat row of icons at the bottom.',

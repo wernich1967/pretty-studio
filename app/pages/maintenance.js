@@ -7,6 +7,7 @@ const ZAR_PER_USD = 18.2; // rough rate for showing AI costs in rand; Anthropic 
 
 export function render() {
   return `<div class="head"><div><h1>Maintenance</h1><div class="sub">Backups, sample data and what's stored in the studio.</div></div></div>
+  <div class="card" style="margin-bottom:16px"><h2>EU Digital tracking</h2><p class="note">Share monthly AI calls, tokens and estimated USD cost with your private EU Digital tracker. Business records and prompts stay in Pretty Studio.</p><div id="reportingStatus" class="note">Checking connection…</div><div class="row" style="margin-top:12px"><input id="reportingCode" placeholder="Connection code from EU Digital" aria-label="EU Digital connection code" autocomplete="off" maxlength="32"><button class="btn" id="connectReporting">Connect EU Digital</button><button class="btn" id="syncReporting">Sync usage</button></div><p id="reportingMessage" class="note" role="status"></p></div>
   <div class="grid2">
     <div class="card"><div class="chead"><span class="cic">${icon('download')}</span><div><h2>Backup</h2><div class="note">Everything in one file</div></div></div>
       <div class="mchips"><span class="mchip"><i></i>Cloudflare also backs up your data automatically</span></div>
@@ -33,7 +34,7 @@ async function stats() {
 }
 
 export async function after() {
-  stats(); aiUsage();
+  stats(); aiUsage(); reporting();
   $('#tfile').onchange = async e => {
     const file = e.target.files[0]; if (!file) return;
     const msg = t => $('#tmsg').innerHTML = t;
@@ -75,4 +76,12 @@ async function aiUsage() {
       return `<tr><td>${when(r.created_at)}</td><td><div class="what"><span class="mini ${f[2]}">${icon(f[1])}</span><span>${esc(f[0])}${r.ok ? '' : ' <span class="pill red" title="' + esc(r.error) + '">failed</span>'}</span></div></td>
         <td class="note"><span class="av">${esc(name.slice(0, 1).toUpperCase())}</span>${esc(name)}</td><td class="r">${tok.toLocaleString('en-ZA')}<div class="tbar"><i style="width:${Math.round(tok / max * 100)}%"></i></div></td><td class="r">${rand(r.cost_usd)}<div class="note">${usd(r.cost_usd)}</div></td></tr>`; }).join('')}</tbody></table>` : '<div class="empty">No AI captures yet.</div>'}
     <p class="note">Anthropic bills in US dollars; rand amounts use about R${ZAR_PER_USD.toFixed(2)} to the dollar. Size is the number of tokens (pieces of text) the AI read and wrote.</p>`;
+}
+
+async function reporting() {
+  const update = async () => { const r = await api('/maintenance/ai-reporting'); $('#reportingStatus').textContent = r.connected ? 'Connected · Usage is shared automatically after each AI call.' + (r.lastSyncedAt ? ' Last sync: ' + new Date(r.lastSyncedAt).toLocaleString('en-ZA', {timeZone:'Africa/Johannesburg'}) : ' Waiting for the first successful sync.') : 'Not connected. Generate a code in EU Digital → Administration → AI Usage.'; $('#syncReporting').disabled = !r.connected; };
+  try { await update(); } catch { $('#reportingStatus').textContent = 'Connection status unavailable.'; }
+  const run = async (path, body) => { $('#connectReporting').disabled = true; $('#syncReporting').disabled = true; $('#reportingMessage').textContent = 'Sending usage…'; try { await api(path, {method:'POST',body}); $('#reportingCode').value = ''; $('#reportingMessage').textContent = 'Usage sent. Open EU Digital’s AI Usage page to see the totals.'; } catch (e) { $('#reportingMessage').textContent = e.message || 'Usage could not be sent.'; } finally { $('#connectReporting').disabled = false; await update(); } };
+  $('#connectReporting').onclick = () => run('/maintenance/ai-reporting/connect', {code:$('#reportingCode').value.trim()});
+  $('#syncReporting').onclick = () => run('/maintenance/ai-reporting/sync', {});
 }

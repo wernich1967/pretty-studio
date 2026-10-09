@@ -1,3 +1,9 @@
+## 0.11.1 — 9 October 2026
+
+- One-time secure pairing with the EU Digital AI Usage tracker.
+- Automatic aggregate usage reporting after each AI call, with historical sync from Maintenance.
+- Reporting credentials stay server-side and are excluded from backup exports.
+
 # Changelog
 
 ## v0.11.0 — 2026-10-07
