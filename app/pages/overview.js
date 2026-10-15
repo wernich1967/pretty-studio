@@ -1,4 +1,4 @@
-import { api, esc, state, money, qty, REASONS, toast, $ } from '../core.js';
+import { api, esc, state, money, qty, REASONS, toast, $, icon, aiRand } from '../core.js';
 import { startTour, MAIN_TOUR } from '../tour.js';
 const QUOTES = ['One good batch at a time — that is how a business grows.', 'Keep notes: your future self is your best apprentice.',
   'Measure twice, pour once, smile always.', 'Your craft is proof that gentle things can be strong.', 'Pretty is not doing less — it is doing it with attention.'];
@@ -8,7 +8,7 @@ export function render() {
   const name = state.me?.business?.ownerName;
   return `<div class="head"><div><h1>${greet}${name ? ', ' + esc(name) : ''}</h1>
     <div class="sub">${new Date().toLocaleDateString('en-ZA', { weekday: 'long', day: '2-digit', month: 'long' })}</div>
-    <div class="quote">“${QUOTES[new Date().getDate() % QUOTES.length]}”</div></div></div>
+    <div class="quote">“${QUOTES[new Date().getDate() % QUOTES.length]}”</div></div><a id="aiPill" class="aipill" hidden></a></div>
     <div id="onb"></div>
     <div class="tiles" id="tiles"><div class="tile"><div class="k">Loading</div><div class="v">…</div></div></div>
     <div class="grid2"><div class="card"><h2>Recent stock changes</h2><div id="recent"></div></div>
@@ -24,6 +24,7 @@ export function render() {
 export async function after() {
   $('#takeTour').onclick = e => { e.preventDefault(); startTour(MAIN_TOUR); };
   onboardingCard();
+  aiPill();
   const d = await api('/dashboard');
   $('#tiles').innerHTML = [['Sales this month', money(d.salesMonth)], ["Ingredients & supplies", d.materials], ['Finished products', d.products], ['Low stock', d.lowStock], ['Curing', d.curing], ['Stock value', money(d.stockValue)]]
     .map(([k, v]) => `<div class="tile"><div class="k">${k}</div><div class="v" ${k === 'Low stock' && v ? 'style="color:var(--rose)"' : ''}>${v}</div></div>`).join('');
@@ -39,4 +40,16 @@ async function onboardingCard() {
       <div class="prog"><div style="width:${Math.round(o.doneCount / o.total * 100)}%"></div></div></div>
       <a class="btn" href="#/setup">${o.started ? 'Continue setup' : 'Start setup'} →</a><button class="btn ghost small" id="onbHide">Hide</button></div></div>`;
   $('#onbHide').onclick = async () => { await api('/onboarding', { method: 'PUT', body: { hidden: true } }); state.onb.hidden = true; box.innerHTML = ''; toast('Hidden — “Getting started” is still in the menu'); };
+}
+
+// AI cost at a glance (top right): today and everything so far, in rand with dollars on hover.
+async function aiPill() {
+  let u; try { u = await api('/ai/usage'); } catch { return; }
+  const el = $('#aiPill'); if (!el || (!u.ready && !u.all.calls)) return;
+  const usd = n => '$' + (Number(n) || 0).toFixed(4);
+  el.innerHTML = `<span class="aip-i">${icon('ai')}</span><span class="aip-l">AI use</span>
+    <span class="aip-v"><span><b>${aiRand(u.today.cost)}</b> today</span><span><b>${aiRand(u.all.cost)}</b> in total</span></span>`;
+  el.title = `Today: ${u.today.calls} capture${u.today.calls === 1 ? '' : 's'}, ${usd(u.today.cost)} · Total: ${u.all.calls} captures, ${usd(u.all.cost)} (billed in US dollars)`;
+  if (state.me?.admin) el.href = '#/maintenance'; else el.removeAttribute('href');
+  el.hidden = false;
 }

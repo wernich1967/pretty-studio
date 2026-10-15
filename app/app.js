@@ -46,18 +46,26 @@ const QUICK = [
   { label: 'Add a recipe', icon: '📖', page: 'recipes', click: '#addR' },
   { label: 'Add an ingredient or supply', icon: '🫙', page: 'inventory', click: '#addItem' }
 ];
-let pendingClick = null;
-function quickMenu(anchor) {
+// The ✨ button bottom right: the AI jobs, one click from anywhere.
+const AI_QUICK = [
+  { label: 'Capture an invoice', icon: '🧾', page: 'purchases', click: '#aiBtn', note: 'Photo, PDF or pasted text — fills in the purchase' },
+  { label: 'Capture a recipe', icon: '📖', page: 'recipes', click: '#aiR', note: 'Photo of a recipe card or pasted text' }
+];
+let pendingClick = null, menuItems = QUICK;
+function quickMenu(anchor, items = QUICK, title = 'Add something new') {
   const open = $('#quick');
-  if (!open.hidden) return closeQuick();
-  open.innerHTML = `<div class="qhead">Add something new</div>${QUICK.map((q, i) => `<button data-i="${i}"><span class="qi">${q.icon}</span><span><b>${q.label}</b>${q.note ? `<span class="note">${q.note}</span>` : ''}</span></button>`).join('')}`;
+  if (!open.hidden) { const same = menuItems === items; closeQuick(); if (same) return; }
+  menuItems = items;
+  open.innerHTML = `<div class="qhead">${title}</div>${items.map((q, i) => `<button data-i="${i}"><span class="qi">${q.icon}</span><span><b>${q.label}</b>${q.note ? `<span class="note">${q.note}</span>` : ''}</span></button>`).join('')}`;
   open.hidden = false; $('#quickShade').hidden = false;
   const mobile = window.innerWidth <= 820;
   open.classList.toggle('sheet', mobile);
-  if (!mobile) { const r = anchor.getBoundingClientRect(); open.style.left = r.left + 'px'; open.style.top = r.bottom + 6 + 'px'; }
-  else { open.style.left = ''; open.style.top = ''; }
+  const r = anchor.getBoundingClientRect();
+  open.style.left = open.style.top = open.style.right = open.style.bottom = '';
+  if (anchor.id === 'aiFab') { open.style.right = (window.innerWidth - r.right) + 'px'; open.style.bottom = (window.innerHeight - r.top + 10) + 'px'; } // opens upwards from the button
+  else if (!mobile) { open.style.left = r.left + 'px'; open.style.top = r.bottom + 6 + 'px'; }
   open.querySelectorAll('[data-i]').forEach(b => b.onclick = () => {
-    const q = QUICK[b.dataset.i]; closeQuick();
+    const q = items[b.dataset.i]; closeQuick();
     pendingClick = q.click;
     if (state.page === q.page) clickPending(); else location.hash = '#/' + q.page;
   });
@@ -105,6 +113,8 @@ $('#ver').addEventListener('click', () => modal(`<h2>What's new</h2><div class="
 $('#menuBtn').addEventListener('click', () => $('#side').classList.toggle('open'));
 $('#newBtn').addEventListener('click', e => quickMenu(e.currentTarget));
 $('#bbNew').addEventListener('click', e => quickMenu(e.currentTarget));
+$('#aiFab').innerHTML = icon('ai');
+$('#aiFab').addEventListener('click', e => quickMenu(e.currentTarget, AI_QUICK, 'AI capture'));
 $('#bbMenu').addEventListener('click', () => $('#side').classList.toggle('open'));
 $('#quickShade').addEventListener('click', () => { closeQuick(); });
 window.addEventListener('keydown', e => { if (e.key === 'Escape') closeQuick(); });

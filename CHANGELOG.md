@@ -1,10 +1,15 @@
-## 0.11.1 — 9 October 2026
+# Changelog
+
+## v0.11.2 — 2026-10-15
+- ✨ AI button (`#aiFab`, bottom right; above the phone bar on small screens) opens the quick menu with `AI_QUICK` (Capture an invoice → `#aiBtn` on Purchases, Capture a recipe → `#aiR` on Recipes). `quickMenu(anchor, items, title)` now takes the item list; opens upwards from the button.
+- Overview: AI cost pill (`#aiPill`) top right — today and all-time cost in rand, dollars and capture counts on hover; links to Maintenance for admins. `GET /ai/usage` adds `today` (South African day, UTC+2).
+- `ZAR_PER_USD` and `aiRand()` moved to `core.js` (shared by Overview and Maintenance). Extra bottom padding so the button never covers the last row.
+
+## v0.11.1 — 2026-10-09
 
 - One-time secure pairing with the EU Digital AI Usage tracker.
 - Automatic aggregate usage reporting after each AI call, with historical sync from Maintenance.
 - Reporting credentials stay server-side and are excluded from backup exports.
-
-# Changelog
 
 ## v0.11.0 — 2026-10-07
 - Colour themes: `:root[data-skin=sage|sea|rose]` in `styles.css` redefine the existing tokens (`--teal*` = main, `--blush*` = accent, `--rose` = warning); sage is the default. `THEMES`, `setSkin`, `themePicker` in `core.js`; picker on Getting started → Your business and in Settings. Saved via `PUT /settings/theme` into the `business` setting (`theme`) and cached in localStorage (`ps-skin`) so the page paints in the right colours before `/me` returns. Hard-coded teal tints and `#fff` card backgrounds replaced with tokens.

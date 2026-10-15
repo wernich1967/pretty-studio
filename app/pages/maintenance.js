@@ -1,9 +1,8 @@
-import { api, toast, esc, $, state, icon } from '../core.js';
+import { api, toast, esc, $, state, icon, ZAR_PER_USD, aiRand } from '../core.js';
 
 const LABELS = { suppliers: 'Suppliers', materials: 'Ingredients & supplies', products: 'Finished products', purchases: 'Purchases', purchase_lines: 'Purchase lines', recipes: 'Recipes', recipe_lines: 'Recipe lines', batches: 'Batches', sales: 'Sales', stock_movements: 'Stock movements', files: 'Photos & invoices', videos: 'Videos' };
 const MAIN = ['materials', 'products', 'recipes', 'purchases', 'batches', 'sales', 'suppliers', 'files'];
 const FEATURES = { 'invoice-capture': ['Invoice captured', 'purchases', ''], 'recipe-capture': ['Recipe captured', 'recipes', 'g'] };
-const ZAR_PER_USD = 18.2; // rough rate for showing AI costs in rand; Anthropic bills in dollars
 
 export function render() {
   return `<div class="head"><div><h1>Maintenance</h1><div class="sub">Backups, sample data and what's stored in the studio.</div></div></div>
@@ -62,7 +61,7 @@ export async function after() {
 
 async function aiUsage() {
   const u = await api('/ai/usage');
-  const rand = n => 'R' + ((Number(n) || 0) * ZAR_PER_USD).toFixed(2), usd = n => '$' + (Number(n) || 0).toFixed(4);
+  const rand = aiRand, usd = n => '$' + (Number(n) || 0).toFixed(4);
   const when = t => { const d = new Date(String(t).replace(' ', 'T') + 'Z'); return isNaN(d) ? esc(t) : `<b>${d.toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short' })}</b><div class="note">${d.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' })}</div>`; };
   const who = e => !e ? '—' : e === state.me?.email ? (state.me.business?.ownerName || 'You') : e.split('@')[0];
   const max = Math.max(1, ...u.recent.map(r => r.input_tokens + r.output_tokens));

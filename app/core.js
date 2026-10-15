@@ -60,6 +60,10 @@ export function convert(q, from, to) {
 }
 export const approx = (from, to) => BASE[from] && BASE[to] && BASE[from][0] !== BASE[to][0];
 
+// AI costs: Anthropic bills in US dollars; shown in rand at a rough fixed rate.
+export const ZAR_PER_USD = 18.2;
+export const aiRand = n => 'R' + ((Number(n) || 0) * ZAR_PER_USD).toFixed(2);
+
 // Line icons (24×24 outline paths) for the menu, footer, phone bar and card headings.
 const ICON_PATHS = {
   overview: 'M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z',
@@ -80,7 +84,8 @@ const ICON_PATHS = {
   download: 'M12 3v12M7 10l5 5 5-5M5 21h14',
   database: 'M5 6c0-1.7 3.1-3 7-3s7 1.3 7 3-3.1 3-7 3-7-1.3-7-3zM5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3',
   palette: 'M12 3a9 9 0 0 0 0 18c1 0 1.5-.8 1.5-1.5 0-1.2-1-1.5-1-2.5 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4-4-7.5-9-7.5zM7.5 11h.01M10 7.5h.01M14.5 7.5h.01',
-  menu: 'M4 7h16M4 12h16M4 17h16'
+  menu: 'M4 7h16M4 12h16M4 17h16',
+  ai: 'M10 4l1.8 5.2L17 11l-5.2 1.8L10 18l-1.8-5.2L3 11l5.2-1.8zM18 3v4M16 5h4M18 15v4M16 17h4'
 };
 export const icon = name => ICON_PATHS[name] ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${ICON_PATHS[name]}"/></svg>` : '';
 
