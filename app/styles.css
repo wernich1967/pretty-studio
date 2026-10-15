@@ -313,3 +313,34 @@ a.aipill[href]:hover{border-color:var(--line2);background:var(--teal-l)}
 @media (max-width:820px){.aifab{right:16px;bottom:calc(84px + env(safe-area-inset-bottom));width:50px;height:50px}.aipill{padding:8px 12px}.aip-l{display:none}}
 @media (prefers-reduced-motion:reduce){.aifab{transition:none}}
 .main{padding-bottom:96px}@media (max-width:820px){.main{padding-bottom:150px}}
+/* Ask a question: panel sliding in from the right */
+.askpanel{position:fixed;top:0;right:0;bottom:0;z-index:48;width:min(420px,100vw);background:var(--card);border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(47,61,66,.14);display:flex;flex-direction:column;transform:translateX(105%);transition:transform .25s ease;visibility:hidden}
+.askpanel.open{transform:none;visibility:visible}
+.askhead{display:flex;gap:12px;align-items:flex-start;padding:20px 20px 14px;border-bottom:1px solid var(--line)}.askhead h2{font-size:24px;margin:0}
+.askmsgs{flex:1;display:flex;flex-direction:column;gap:10px;overflow:auto;padding:16px 20px;background:var(--bg)}
+.askfoot{padding:12px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.askq{align-self:flex-end;max-width:85%;background:var(--teal);color:#fff;border-radius:14px 14px 4px 14px;padding:8px 13px;white-space:pre-wrap}
+.aska{align-self:flex-start;max-width:94%;background:var(--card);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:9px 14px}
+.aska p{margin:0 0 6px}.aska p:last-of-type{margin-bottom:0}.aska ul{margin:4px 0 6px;padding-left:18px}.aska .note{margin-top:6px;font-size:12px}
+.aska.err{border-color:var(--blush-l);color:var(--rose)}
+.aska.thinking{color:var(--muted)}
+.askempty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;color:var(--muted);padding:40px 8px;margin:auto 0}.askempty p{margin:0}
+.asksugg{margin-bottom:10px}.asksugg .chip{border:0;cursor:pointer;padding:6px 12px;font:600 12.5px "Source Sans 3"}.asksugg .chip:hover{background:var(--line)}
+.askrow{display:flex;gap:8px}.askrow input{flex:1}
+@media (prefers-reduced-motion:reduce){.askpanel{transition:none}}
+/* Help page */
+.hquick{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:18px}
+.hq{display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;font:inherit;color:var(--text);text-decoration:none;margin:0;padding:16px 18px}
+.hq:hover{border-color:var(--line2);background:var(--teal-l)}
+.hq b{display:block;font:500 19px "Cormorant Garamond",serif}.hq .note{display:block}
+#hSearch{margin-bottom:6px}
+.hgroup{margin-top:18px}
+.hgroup h2{font-size:22px;margin-bottom:6px}.hgroup h2 .cic{width:34px;height:34px}.hgroup h2 .cic svg{width:17px;height:17px}
+.hitem{border-bottom:1px solid var(--line)}
+.hitem summary{list-style:none;cursor:pointer;padding:11px 4px;font-weight:600;display:flex;justify-content:space-between;gap:12px}
+.hitem summary::-webkit-details-marker{display:none}
+.hitem summary::after{content:"+";color:var(--muted);font-weight:400;font-size:18px;line-height:1}
+.hitem[open] summary::after{content:"–"}
+.hitem summary:hover{color:var(--teal-d)}
+.hans{padding:0 4px 14px;color:var(--muted)}.hans b{color:var(--text)}.hans ul{margin:6px 0;padding-left:18px}
+#hNone{margin-top:14px}

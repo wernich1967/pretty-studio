@@ -1,4 +1,5 @@
 import { CHANGELOG } from './changelog.js';
+import { openAsk } from './ask.js';
 import { state, $, esc, api, modal, icon, setSkin } from './core.js';
 import * as overview from './pages/overview.js';
 import * as stock from './pages/stock.js';
@@ -14,6 +15,7 @@ import * as curing from './pages/curing.js';
 import * as calculators from './pages/calculators.js';
 import * as setup from './pages/setup.js';
 import * as suppliers from './pages/suppliers.js';
+import * as help from './pages/help.js';
 
 const APP_VERSION = CHANGELOG[0].version, APP_DATE = CHANGELOG[0].date;
 // Menu: grouped along the flow — buy → make → sell — then stock, money and tools. Settings & admin as footer links.
@@ -33,7 +35,7 @@ const PAGES = [
   { id: 'videos', label: 'Videos', group: 'Tools', mod: videos },
   { id: 'settings', label: 'Settings', foot: true, eyebrow: 'Studio', mod: settings },
   { id: 'maintenance', label: 'Maintenance', foot: true, admin: true, eyebrow: 'Admin only', mod: maintenance },
-  { id: 'help', label: 'Help', foot: true, soon: true }
+  { id: 'help', label: 'Help', foot: true, eyebrow: 'Studio', mod: help }
 ];
 
 // "+ New" — the everyday jobs, one click from anywhere. `click` is the button the page itself uses.
@@ -48,6 +50,7 @@ const QUICK = [
 ];
 // The ✨ button bottom right: the AI jobs, one click from anywhere.
 const AI_QUICK = [
+  { label: 'Ask a question', icon: '💬', action: openAsk, note: 'e.g. “Do I have coconut oil in stock?”' },
   { label: 'Capture an invoice', icon: '🧾', page: 'purchases', click: '#aiBtn', note: 'Photo, PDF or pasted text — fills in the purchase' },
   { label: 'Capture a recipe', icon: '📖', page: 'recipes', click: '#aiR', note: 'Photo of a recipe card or pasted text' }
 ];
@@ -66,6 +69,7 @@ function quickMenu(anchor, items = QUICK, title = 'Add something new') {
   else if (!mobile) { open.style.left = r.left + 'px'; open.style.top = r.bottom + 6 + 'px'; }
   open.querySelectorAll('[data-i]').forEach(b => b.onclick = () => {
     const q = items[b.dataset.i]; closeQuick();
+    if (q.action) return q.action();
     pendingClick = q.click;
     if (state.page === q.page) clickPending(); else location.hash = '#/' + q.page;
   });

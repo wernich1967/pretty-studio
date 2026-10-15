@@ -2,11 +2,10 @@ import { api, toast, esc, $, state, icon, ZAR_PER_USD, aiRand } from '../core.js
 
 const LABELS = { suppliers: 'Suppliers', materials: 'Ingredients & supplies', products: 'Finished products', purchases: 'Purchases', purchase_lines: 'Purchase lines', recipes: 'Recipes', recipe_lines: 'Recipe lines', batches: 'Batches', sales: 'Sales', stock_movements: 'Stock movements', files: 'Photos & invoices', videos: 'Videos' };
 const MAIN = ['materials', 'products', 'recipes', 'purchases', 'batches', 'sales', 'suppliers', 'files'];
-const FEATURES = { 'invoice-capture': ['Invoice captured', 'purchases', ''], 'recipe-capture': ['Recipe captured', 'recipes', 'g'] };
+const FEATURES = { 'invoice-capture': ['Invoice captured', 'purchases', ''], 'recipe-capture': ['Recipe captured', 'recipes', 'g'], ask: ['Question answered', 'ai', 'g'] };
 
 export function render() {
   return `<div class="head"><div><h1>Maintenance</h1><div class="sub">Backups, sample data and what's stored in the studio.</div></div></div>
-  <div class="card" style="margin-bottom:16px"><h2>EU Digital tracking</h2><p class="note">Share monthly AI calls, tokens and estimated USD cost with your private EU Digital tracker. Business records and prompts stay in Pretty Studio.</p><div id="reportingStatus" class="note">Checking connection…</div><div class="row" style="margin-top:12px"><input id="reportingCode" placeholder="Connection code from EU Digital" aria-label="EU Digital connection code" autocomplete="off" maxlength="32"><button class="btn" id="connectReporting">Connect EU Digital</button><button class="btn" id="syncReporting">Sync usage</button></div><p id="reportingMessage" class="note" role="status"></p></div>
   <div class="grid2">
     <div class="card"><div class="chead"><span class="cic">${icon('download')}</span><div><h2>Backup</h2><div class="note">Everything in one file</div></div></div>
       <div class="mchips"><span class="mchip"><i></i>Cloudflare also backs up your data automatically</span></div>
@@ -18,7 +17,7 @@ export function render() {
       <button class="btn danger" id="rmTest">Remove all test data</button></div>
       <div id="tmsg" class="note" style="margin-top:10px"></div></div>
   </div>
-  <div class="card"><div class="chead"><span class="cic warm">${icon('setup')}</span><div><h2>AI usage</h2><div class="note">Invoice and recipe capture</div></div></div><div id="ai"><div class="empty">Loading…</div></div></div>
+  <div class="card"><div class="chead"><span class="cic warm">${icon('setup')}</span><div><h2>AI usage</h2><div class="note">Invoice and recipe capture, and questions</div></div></div><div id="ai"><div class="empty">Loading…</div></div></div>
   <div class="card"><div class="chead"><span class="cic">${icon('database')}</span><div><h2>What's stored</h2><div class="note">Records in the studio right now</div></div></div><div id="stats"><div class="empty">Loading…</div></div></div>`;
 }
 
@@ -33,7 +32,7 @@ async function stats() {
 }
 
 export async function after() {
-  stats(); aiUsage(); reporting();
+  stats(); aiUsage(); // EU Digital usage reporting (reporting() below) is hidden; the server side stays off until connected
   $('#tfile').onchange = async e => {
     const file = e.target.files[0]; if (!file) return;
     const msg = t => $('#tmsg').innerHTML = t;
@@ -67,9 +66,9 @@ async function aiUsage() {
   const max = Math.max(1, ...u.recent.map(r => r.input_tokens + r.output_tokens));
   const per = u.month.calls ? u.month.cost / u.month.calls : 0;
   $('#ai').innerHTML = `${u.ready ? '' : '<div class="box aibox" style="margin-bottom:12px">AI is not switched on yet — the ANTHROPIC_API_KEY secret still needs to be added in Cloudflare.</div>'}
-    <div class="tiles"><div class="tile stile"><div class="k">Captures this month</div><div class="v">${u.month.calls}</div></div>
+    <div class="tiles"><div class="tile stile"><div class="k">AI uses this month</div><div class="v">${u.month.calls}</div></div>
       <div class="tile stile"><div class="k">Cost this month</div><div class="v">${rand(u.month.cost)}</div><div class="note">${usd(u.month.cost)}</div></div>
-      <div class="tile stile"><div class="k">Average per capture</div><div class="v">${rand(per)}</div><div class="note">All time: ${rand(u.all.cost)} · ${u.all.calls} captures</div></div></div>
+      <div class="tile stile"><div class="k">Average per use</div><div class="v">${rand(per)}</div><div class="note">All time: ${rand(u.all.cost)} · ${u.all.calls} uses</div></div></div>
     ${u.recent.length ? `<table class="tbl"><thead><tr><th class="band">When</th><th class="band">What</th><th class="band">By</th><th class="band r">Size</th><th class="band r">Cost</th></tr></thead><tbody>${u.recent.map(r => {
       const f = FEATURES[r.feature] || [r.feature, 'setup', ''], tok = r.input_tokens + r.output_tokens, name = who(r.user);
       return `<tr><td>${when(r.created_at)}</td><td><div class="what"><span class="mini ${f[2]}">${icon(f[1])}</span><span>${esc(f[0])}${r.ok ? '' : ' <span class="pill red" title="' + esc(r.error) + '">failed</span>'}</span></div></td>
@@ -77,6 +76,7 @@ async function aiUsage() {
     <p class="note">Anthropic bills in US dollars; rand amounts use about R${ZAR_PER_USD.toFixed(2)} to the dollar. Size is the number of tokens (pieces of text) the AI read and wrote.</p>`;
 }
 
+// Not shown at the moment (card removed from Maintenance in 0.12.0). Kept so EU Digital tracking can be switched back on.
 async function reporting() {
   const update = async () => { const r = await api('/maintenance/ai-reporting'); $('#reportingStatus').textContent = r.connected ? 'Connected · Usage is shared automatically after each AI call.' + (r.lastSyncedAt ? ' Last sync: ' + new Date(r.lastSyncedAt).toLocaleString('en-ZA', {timeZone:'Africa/Johannesburg'}) : ' Waiting for the first successful sync.') : 'Not connected. Generate a code in EU Digital → Administration → AI Usage.'; $('#syncReporting').disabled = !r.connected; };
   try { await update(); } catch { $('#reportingStatus').textContent = 'Connection status unavailable.'; }

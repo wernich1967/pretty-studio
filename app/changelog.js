@@ -1,5 +1,12 @@
 // Shown in the app under "What's new" (click the version label). Newest first.
 export const CHANGELOG = [
+  { version: '0.12.0', date: '2026-10-15', items: [
+    '💬 Ask a question: click the ✨ button and ask in plain English — “Do I have coconut oil in stock?”, “What is running low?”, “Can I make two batches of Rose Hair Oil?”, “What did I sell last month?”. Answers come from your own records, and it can only look — it never changes anything.',
+    'The question panel slides in from the right, so you can keep looking at the page while you ask — and your conversation stays there when you close it.',
+    'New Help page (the ? icon at the bottom of the menu): short answers for every part of the studio, with a search box, plus quick links to the tour, the AI and the setup guide.',
+    'The AI cost on the Overview and in Maintenance now includes questions as well as captures.',
+    'The EU Digital tracking box was removed from Maintenance.'
+  ]},
   { version: '0.11.2', date: '2026-10-15', items: [
     'New ✨ button at the bottom right of every page: capture an invoice or a recipe with AI in one click.',
     'The Overview shows what the AI has cost today and in total, in rand (hover for the dollar amounts and number of captures).'

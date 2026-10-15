@@ -8,6 +8,7 @@ import * as recipes from '../../lib/api/recipes.js';
 import * as videos from '../../lib/api/videos.js';
 import * as sales from '../../lib/api/sales.js';
 import * as ai from '../../lib/api/ai.js';
+import * as ask from '../../lib/api/ask.js';
 import * as aiReporting from '../../lib/api/ai-reporting.js';
 import * as onboarding from '../../lib/api/onboarding.js';
 
@@ -20,6 +21,7 @@ recipes.register(router);
 videos.register(router);
 sales.register(router);
 ai.register(router);
+ask.register(router);
 aiReporting.register(router);
 onboarding.register(router);
 

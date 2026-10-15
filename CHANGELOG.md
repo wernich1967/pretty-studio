@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.12.0 — 2026-10-15
+- Ask a question: `POST /ai/ask` (`lib/api/ask.js`) — Claude answers from the owner's records via read-only tools (`find_items`, `item_history`, `recipes` with batches-possible-from-stock, `sales_summary`, `purchases`, `batches`, `expenses`, `suppliers`). No tool writes. Conversation history (last 6 turns) sent by the client. Logged as feature `ask`.
+- `chat()` in `lib/ai.js`: multi-round tool loop (max 6 rounds), usage of all rounds logged as one `ai_usage` row.
+- `app/ask.js`: right-hand slide-out panel (`.askpanel`, z-index 48 — below modals so captures still open on top) opened from the ✨ menu (`AI_QUICK` items may now have an `action`); conversation kept while closed; suggestions, "New conversation", sources and cost under each answer; Esc closes.
+- Help page (`app/pages/help.js`, `#/help`): searchable topics per area (Start here, Buy, Make, Sell, Stock, Money, AI, Tools, Settings & data, common questions) and quick cards for the tour, Ask and Getting started.
+- Maintenance: EU Digital tracking card removed from the page (`reporting()` kept but not called; server side unchanged and inactive until paired). AI usage labels cover questions.
+
 ## v0.11.2 — 2026-10-15
 - ✨ AI button (`#aiFab`, bottom right; above the phone bar on small screens) opens the quick menu with `AI_QUICK` (Capture an invoice → `#aiBtn` on Purchases, Capture a recipe → `#aiR` on Recipes). `quickMenu(anchor, items, title)` now takes the item list; opens upwards from the button.
 - Overview: AI cost pill (`#aiPill`) top right — today and all-time cost in rand, dollars and capture counts on hover; links to Maintenance for admins. `GET /ai/usage` adds `today` (South African day, UTC+2).

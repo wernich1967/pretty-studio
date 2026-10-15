@@ -49,7 +49,7 @@ async function aiPill() {
   const usd = n => '$' + (Number(n) || 0).toFixed(4);
   el.innerHTML = `<span class="aip-i">${icon('ai')}</span><span class="aip-l">AI use</span>
     <span class="aip-v"><span><b>${aiRand(u.today.cost)}</b> today</span><span><b>${aiRand(u.all.cost)}</b> in total</span></span>`;
-  el.title = `Today: ${u.today.calls} capture${u.today.calls === 1 ? '' : 's'}, ${usd(u.today.cost)} · Total: ${u.all.calls} captures, ${usd(u.all.cost)} (billed in US dollars)`;
+  el.title = `Today: ${u.today.calls} AI use${u.today.calls === 1 ? '' : 's'}, ${usd(u.today.cost)} · Total: ${u.all.calls} AI uses, ${usd(u.all.cost)} (billed in US dollars)`;
   if (state.me?.admin) el.href = '#/maintenance'; else el.removeAttribute('href');
   el.hidden = false;
 }
